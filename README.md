@@ -44,42 +44,42 @@ package game
     - Setup setup
     - boolean started
     - Player activePlayer
-    - Player[] gameLoop
-    - 
-  - Setup
-    - Set<Set<List>> PlayingField
-    - List<Tiles> pool (Singleton hier werden alle Tiles initial erstellt)
-    - List<Player> player
-    - Game game
-
+    - int players -> Number of players
+    - PlayingField playingfield
+    - List[Tiles] pool (Hier werden alle Tiles initial erstellt)
 
 package model
-  - PlayingField
-    - Set<List> TilesByColor
-  - TilesByColor
-    - Enum color (blue, red, yellow, black, mixed(only for field))
-    - List tiles
+    (Hauptkomponenten)
   - Player
     - Rack rack
     - int id
     - String name
-    
-package items
   - Tile
     - Enum color (blue, red, yellow, black)
     - int number (0 - 13)
     - boolean joker
-  - TileSet
-    - List tiles
-    - SetType setType
-        - boolean numericalSeries
-        - int maxTiles (4, (26 !überlegen))  
-    - (method) split
-    - (method) append
-    - (method) reduce
   - Rack
     - List tiles
     - (method) sortNumbers, sortColors
     - (method) removeTiles
-    - (method) addTile
+    - (method) addTile 
     
+    (Spielfeld)
+  - PlayingField
+    - List[TileSet]
+    (Auf dem Spielfeld liegende Sets)
+  - TileSet
+    - List tiles
+    - boolean series
+    - (method) split
+    - (method) append
+    - (method) reduce
+    // - SetType setType
+            - boolean numericalSeries
+            - int maxTiles (4, (26 !überlegen))  
+        
+    
+    
+  ?- TilesByColor
+  ?  - Enum color (blue, red, yellow, black, mixed(only for field))
+  ?  - List tiles

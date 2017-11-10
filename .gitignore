@@ -3,3 +3,5 @@ target/
 
 *.class
 *.log
+/src/main/scala/example/
+/src/test/scala/example/
