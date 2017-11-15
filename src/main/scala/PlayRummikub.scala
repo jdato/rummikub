@@ -25,8 +25,7 @@ object PlayRummikub extends App  {
     var game = new Game(numberPlayers)
 
     game.startGame()
-    game.printPool()
-
+    //game.printPool()
 
     //} // End Game Loop
 }

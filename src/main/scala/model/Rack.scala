@@ -5,18 +5,22 @@ package model
   */
 class Rack(theTiles: List[Tile]){
   var tiles: List[Tile] = theTiles
-
   def sortNumbers(): Unit = {
     println("Implement sort numbers method.")
   }
   def sortColors(): Unit = {
     println("Implement sort colors method.")
   }
-  def removeTiles(): Unit = {
+  def removeTiles(tile: Tile): Unit = {
     println("Implement remove tile/s method.")
+    tiles.drop(tiles.indexOf(tile))
   }
-  def addTile(): Unit ={
+  def addTile(tile: Tile): Unit ={
     println("Implement add tile method.")
+    tiles.::(tile)
+  }
+  def print():Unit = {
+    for (t <- tiles) t.printTile()
   }
 }
 

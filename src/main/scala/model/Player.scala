@@ -7,7 +7,12 @@ class Player(theRack : Rack, theId : Int) {
   var rack: Rack = theRack
   var id: Int = theId
   //var name = theName
+  def print():Unit = {
+    println("Player" + id)
+    rack.print()
+  }
 }
+
 
 object Player {
 
