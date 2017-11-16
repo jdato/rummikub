@@ -21,6 +21,12 @@ class Game(_numberOfPlayers: Int) {
     // calls init method
     initializePool()
     initializePlayers()
+
+    players.head.rack.sortNumbers()
+    players.head.rack.print()
+
+    players.last.rack.sortColors()
+    players.last.rack.print()
     // Enters the game loop
     println("Implement start game method.")
 
@@ -76,7 +82,7 @@ class Game(_numberOfPlayers: Int) {
   def initializePlayers() = {
     for(i <- 1 to numberOfPlayers){
       var player = new Player(initializeRack(), i)
-      player.print()
+      //player.print()
       players.+=(player)
     }
   }
