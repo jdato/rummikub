@@ -22,14 +22,8 @@ class Game(_numberOfPlayers: Int) {
     initializePool()
     initializePlayers()
 
-    players.head.rack.sortNumbers()
-    players.head.rack.printRack()
-
-    players.last.rack.sortColors()
-    players.last.rack.printRack()
     // Enters the game loop
-    println("Implement start game method.")
-
+    println("Game started.")
   }
 
   def abortGame(): Unit = {
@@ -37,9 +31,8 @@ class Game(_numberOfPlayers: Int) {
     println("Implement abort game method.")
   }
 
-
+  // Initializes the pool and sets all the available stones in it
   def initializePool(): Unit = {
-    // Initializes the pool and sets all the available stones in it
     var color = 0
     var twoDecks = 0
     var number = 0
@@ -55,7 +48,6 @@ class Game(_numberOfPlayers: Int) {
         for (number <- 1 to 13) {
           val tile = new Tile(currColor, number, false)
           pool.+=(tile)
-          //tile.printTile()
         }
       }
     }
@@ -71,15 +63,14 @@ class Game(_numberOfPlayers: Int) {
     // Add the jokers
     val joker = new Tile(red, 0, true)
     pool.+=(joker)
-    //joker.printTile()
     joker.color = black
     pool.+=(joker)
-    //joker.printTile()
+
     println("Pool initialized.")
   }
 
   //
-  def initializePlayers() = {
+  def initializePlayers(): Unit = {
     for(i <- 1 to numberOfPlayers){
       var player = new Player(initializeRack(), i)
       //player.print()
@@ -91,7 +82,7 @@ class Game(_numberOfPlayers: Int) {
     for(i <- 1 to 14){
       tiles.+=(getRandomTile())
     }
-    return new Rack(tiles.toList)
+    new Rack(tiles.toList) // Implicit return statement
   }
 
   def getRandomTile(): Tile = {
@@ -105,7 +96,7 @@ class Game(_numberOfPlayers: Int) {
       }
       i=i+1
     }
-    return null
+    null // Implicit return statement
   }
 
   // GIbt den gesammten Pool aus

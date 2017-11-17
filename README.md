@@ -8,8 +8,8 @@ Hier soll eine Iplementierung des Spiels Rummikub in Scala entstehen. Die Rahmen
 - Es gibt vier Farben (blau, rot, gelb, schwarz)
 - In jeder Farbe gibt es die Zahlen 1 - 13 in zweifacher Ausführung
 - Es gibt zwei Joker (rot, schwarz)
-- Jeder Spieler hat eine Ablage für seine Spielsteine (n - m Spieler)
-- Es gibt einen Pool von Steinen aus dem zufällig Spielsteine entnommen und zurück gelegt werden können (nur Relevat für erste Runde) 
+- Jeder Spieler hat eine Ablage für seine Spielsteine (2 - 4 Spieler)
+- Es gibt einen Pool von Steinen aus dem zufällig Spielsteine entnommen und zurück gelegt werden können
 
 #### Spielaufbau
 
@@ -83,3 +83,10 @@ package model
   ?- TilesByColor
   ?  - Enum color (blue, red, yellow, black, mixed(only for field))
   ?  - List tiles
+  
+  
+### Hintenangestellt
+
+- Zeit (1 min) bis der nächste dran ist 
+
+  
