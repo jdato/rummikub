@@ -53,6 +53,7 @@ package model
   - Player
     - Rack rack
     - int id
+    - Boolean madeFirstMove
     - String name
   - Tile
     - Enum color (blue, red, yellow, black)
