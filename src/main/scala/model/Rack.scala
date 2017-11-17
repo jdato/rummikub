@@ -12,13 +12,15 @@ class Rack(theTiles: List[Tile]){
   def sortColors(): Unit = {
     tiles = tiles.sortWith((x,y) => x.color > y.color)
   }
-  def removeTiles(tile: Tile): Unit = {
-    if(tiles.contains(tile)) tiles.drop(tiles.indexOf(tile))
+  def removeTile(tile: Tile): Unit = {
+    if(tiles.contains(tile)) {
+      tiles = tiles.filter(_ != tile)
+    }
   }
   def addTile(tile: Tile): Unit ={
-    tiles.::(tile)
+    tiles.::=(tile)
   }
-  def print():Unit = {
+  def printRack():Unit = {
     for (t <- tiles) t.printTile()
   }
 }

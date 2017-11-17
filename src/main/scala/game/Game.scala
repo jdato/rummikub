@@ -23,10 +23,10 @@ class Game(_numberOfPlayers: Int) {
     initializePlayers()
 
     players.head.rack.sortNumbers()
-    players.head.rack.print()
+    players.head.rack.printRack()
 
     players.last.rack.sortColors()
-    players.last.rack.print()
+    players.last.rack.printRack()
     // Enters the game loop
     println("Implement start game method.")
 
@@ -68,7 +68,7 @@ class Game(_numberOfPlayers: Int) {
       case _ => "no color"
     }
 
-    // Add the jokers TODO hier true oder flase übergeben ?
+    // Add the jokers
     val joker = new Tile(red, 0, true)
     pool.+=(joker)
     //joker.printTile()
@@ -88,15 +88,14 @@ class Game(_numberOfPlayers: Int) {
   }
   def initializeRack() : Rack = {
     var tiles : Set[Tile] = Set()
-    for(i <- 1 to 10){
+    for(i <- 1 to 14){
       tiles.+=(getRandomTile())
     }
     return new Rack(tiles.toList)
   }
 
   def getRandomTile(): Tile = {
-    //TODO num´tes Element aus dem pool holen, dort löschen und zurück geben
-    // geht evtl einfacher, hab ich jedoch nirgends gefunden
+    //TODO get Random Tile from pool
     val num = new Random().nextInt(pool.size)
     var i = 0: Int
     for (t <- pool){

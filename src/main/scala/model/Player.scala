@@ -9,7 +9,7 @@ class Player(theRack : Rack, theId : Int) {
   //var name = theName
   def print():Unit = {
     println("Player" + id)
-    rack.print()
+    rack.printRack()
   }
 }
 
