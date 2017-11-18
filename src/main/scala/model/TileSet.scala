@@ -11,8 +11,8 @@ class TileSet(theTiles : List[Tile], isSeries : Boolean) {
   def split(): Unit = {
     println("Implement split method.")
   }
-  def append(): Unit = {
-    println("Implement append method.")
+  def append(tile: Tile): Unit = {
+    tiles.::=(tile)
   }
   def reduce(): Unit ={
     println("Implement reduce method.")

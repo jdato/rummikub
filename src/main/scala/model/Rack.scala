@@ -1,20 +1,16 @@
 package model
 
-import game.Utils
-
 /**
   * Created by johannesdato on 10.11.17.
   */
-class Rack(theTiles: List[Tile]) {
+class Rack(theTiles: List[Tile]){
   var tiles: List[Tile] = theTiles
-  var utils = new Utils()
 
   def sortNumbers(): Unit = {
-    tiles = tiles sortBy (_.number)
+    tiles = tiles  sortBy (_.number)
   }
-
   def sortColors(): Unit = {
-    tiles = tiles.sortWith((x, y) => x.color > y.color)
+    tiles = tiles.sortWith((x,y) => x.color > y.color)
   }
   def removeTile(tile: Tile): Unit = {
     if(tiles.contains(tile)) {
@@ -24,11 +20,9 @@ class Rack(theTiles: List[Tile]) {
   def addTile(tile: Tile): Unit ={
     tiles.::=(tile)
   }
-
-  def printRack(): Unit = {
-    utils.printTilesHorizontally(tiles)
+  def printRack():Unit = {
+    for (t <- tiles) t.printTile()
   }
-
 }
 
 object Rack {
