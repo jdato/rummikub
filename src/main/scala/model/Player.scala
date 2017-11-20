@@ -9,7 +9,7 @@ class Player(theRack : Rack, theId : Int) {
   val madeFirstMove: Boolean = false
   var pass: Boolean = true
   //var name = theName
-  def print():Unit = {
+  def printPlayer():Unit = {
     println("Player" + id)
     rack.printRack()
   }

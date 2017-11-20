@@ -51,6 +51,7 @@ class Game(_numberOfPlayers: Int) {
               println("set all possible Tiles")
               for(tileSet<-checkMoves(player.rack)){
                 playingfield.playTileSet(tileSet)
+                //TODO deleting Tiles in PlayingField umsetzen ?
                 for(tile<-tileSet.tiles) player.rack.removeTile(tile)
               }
               printPlayingField(player)
@@ -175,7 +176,7 @@ class Game(_numberOfPlayers: Int) {
     var tiles: List[Tile] = List[Tile]()
 
     var number: Int = 0
-    var count: Int = 1
+    var count: Int = 0
     var color: String = ""
 
     rack.sortNumbers()
@@ -213,22 +214,25 @@ class Game(_numberOfPlayers: Int) {
   // checking for any Sets in the rack
   def checkSet(rack: Rack): List[TileSet] = {
     //TODO method ignores jockers and same colored Tiles
+    //TODO if more than 3 Tiles are found with the same number, the method return a TileSet with 3 tiles, a TileSet with 4 Tiles,...
     var tileSets: List[TileSet] = List[TileSet]()
+    var tiles: List[Tile] = List[Tile]()
     var number: Int = 0
-    var count: Int = 1
+    var count: Int = 0
     var tilesToSet =List[Tile]()
 
     rack.sortNumbers()
     for (tile <- rack.tiles) {
       if (number == tile.number) {
         count.+=(1)
+        tiles = tiles.::(tile)
       } else {
         number = tile.number
         count = 1
+        tiles = List[Tile]().::(tile)
       }
       if(count >= 3){
-        tilesToSet = rack.tiles.filter(_.number == number)
-        tileSets = tileSets.::(new TileSet(tilesToSet,false))
+        tileSets = tileSets.::(new TileSet(tiles,false))
       }
     }
     return tileSets
