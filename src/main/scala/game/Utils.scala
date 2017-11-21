@@ -23,7 +23,6 @@ class Utils {
     println()
     tiles.foreach(t => printAndReset(t.color, " --- "))
     println()
-
   }
 
   def printAndReset(color: String, string: String): Unit = {

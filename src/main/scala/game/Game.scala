@@ -96,7 +96,7 @@ class Game(_numberOfPlayers: Int) {
       }
     }
 
-    def matchColor(x: Int) : String = x match {
+    def matchColor(x: Int): String = x match {
       case 1 => red
       case 2 => blue
       case 3 => yellow
@@ -115,14 +115,14 @@ class Game(_numberOfPlayers: Int) {
 
   //Initializes the players
   def initializePlayers(): Unit = {
-    for(i <- 1 to numberOfPlayers){
+    for (i <- 1 to numberOfPlayers) {
       var player = new Player(initializeRack(), i)
       //player.print()
       players.+=(player)
     }
   }
 
-  //Initializes the rack and set random Tiles
+  //Initializes the rack and set random Tiles  def initializeRack() : Rack = {
   def initializeRack() : Rack = {
     var tiles : Set[Tile] = Set()
     for(i <- 1 to 14){
@@ -136,23 +136,60 @@ class Game(_numberOfPlayers: Int) {
     //TODO get Random Tile from pool
     val num = new Random().nextInt(pool.size)
     var i = 0: Int
-    for (t <- pool){
-      if(i==num){
+    for (t <- pool) {
+      if (i == num) {
         pool.-=(t)
         return t
       }
-      i=i+1
-      null
+      i = i + 1
     }
     //if no Tiles in pool
     //TODO handle no Tiles in pool
-    null
+    null // Implicit return statement
   }
 
   // prints the whole pool
   def printPool(): Unit = {
     for (t <- pool) t.printTile()
     //pool.foreach((t: Tile) => t.printTile())
+  }
+
+  def gambleForStartingPositon(): Player = {
+
+    println("Gambling for the starting position.")
+
+    var starter: List[Player] = List()
+    var jokerPicked = false
+
+    // Repeat if two player pick the same number or a joker has been picked
+    do {
+      starter = List()
+      jokerPicked = false
+      var initTiles: List[Tile] = List()
+      // Initial picking of numbers
+      players.foreach(p => {
+        val tile = p.pickInitTile(getRandomTile())
+        initTiles.::=(tile)
+        println("Player " + p.id + " picked: ")
+        tile.printTile()
+      })
+      val maxByVal = initTiles.maxBy(tile => tile.number)
+      players.foreach(p => {
+        if (p.initTile.number == maxByVal.number) {
+          starter.::=(p)
+        }
+        if (p.initTile.number == 0) {
+          jokerPicked = true
+        }
+      })
+      if (jokerPicked) println("Joker picked. Repeating start.")
+      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
+    } while (starter.count(p => true) > 1 || jokerPicked)
+
+    val startPlayer = starter.head
+    print("Player " + startPlayer.id + " starts.")
+    startPlayer
+
   }
 
   //prints the Playingfield for the specific Player
