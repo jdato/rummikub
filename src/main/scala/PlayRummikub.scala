@@ -1,5 +1,5 @@
 import game.{Game, Utils}
-import model.{Player, Tile}
+import scala.io.StdIn
 
 /**
   * Created by johannesdato on 10.11.17.
@@ -17,8 +17,7 @@ object PlayRummikub extends App {
   // Select number of players
   do {
     print("Number of players: ")
-    // numberPlayers = 4
-    numberPlayers = readInt()
+      numberPlayers = StdIn.readInt()
   }
   while (numberPlayers < 2 || numberPlayers > 4)
 
