@@ -6,10 +6,6 @@ import model.{Player, Tile}
   */
 class PlayRummikub {
 
-  def playerpickTile(): Unit = {
-
-  }
-
 }
 
 object PlayRummikub extends App {
@@ -21,8 +17,8 @@ object PlayRummikub extends App {
   // Select number of players
   do {
     print("Number of players: ")
-    numberPlayers = 4
-    //numberPlayers = readInt()
+    // numberPlayers = 4
+    numberPlayers = readInt()
   }
   while (numberPlayers < 2 || numberPlayers > 4)
 
@@ -34,7 +30,7 @@ object PlayRummikub extends App {
   var starter: List[Player] = List()
   var jokerPicked = false
 
-  // Repeat if two player pick the same number
+  // Repeat if two player pick the same number or a joker has been picked
   do {
     starter = List()
     jokerPicked = false
