@@ -24,46 +24,4 @@ object PlayRummikub extends App {
 
   var game = new Game(numberPlayers)
   game.startGame()
-
-  println("Gambling for the starting position.")
-
-  var starter: List[Player] = List()
-  var jokerPicked = false
-
-  // Repeat if two player pick the same number or a joker has been picked
-  do {
-    starter = List()
-    jokerPicked = false
-    var initTiles: List[Tile] = List()
-    // Initial picking of numbers
-    game.players.foreach(p => {
-      val tile = p.pickInitTile(game.getRandomTile())
-      initTiles.::=(tile)
-      println("Player " + p.id + " picked: ")
-      tile.printTile()
-    })
-    val maxByVal = initTiles.maxBy(tile => tile.number)
-    game.players.foreach(p => {
-      if (p.initTile.number == maxByVal.number) {
-        starter.::=(p)
-      }
-      if (p.initTile.number == 0) {
-        jokerPicked = true
-      }
-    })
-    if (jokerPicked) println("Joker picked. Repeating start.")
-    if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
-  } while (starter.count(p => true) > 1 || jokerPicked)
-
-  print("Player " + starter.head.id + " starts.")
-
-
-
-  /*
-  println("Players Rack: ")
-  game.players.head.rack.sortNumbers()
-  game.players.head.rack.sortColors()
-  game.players.head.rack.printRack()
-  */
-
 }
