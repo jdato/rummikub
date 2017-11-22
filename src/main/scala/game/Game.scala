@@ -9,12 +9,12 @@ import model._
   */
 class Game(_numberOfPlayers: Int) {
 
-  var playingfield : Playingfield = new Playingfield
+  var playingfield: Playingfield = new Playingfield
   var numberOfPlayers: Int = _numberOfPlayers
   var utils: Utils = new Utils
 
-  var pool : Set[Tile] = Set[Tile]()
-  var players : Set[Player] = Set()
+  var pool: Set[Tile] = Set[Tile]()
+  var players: Set[Player] = Set()
   var started = false
   var activePlayerId = 1
 
@@ -25,42 +25,61 @@ class Game(_numberOfPlayers: Int) {
 
     // Enters the game loop
     println("Game started.")
-    started =true
+    started = true
 
+    var firstRound = true
+    var starter = gambleForStartingPositon()
 
-    while(started){
-      for(player<-players){
-        player.pass = false
-        player.rack.addTile(getRandomTile())
-        //while not passing its your turn
-        while(!player.pass){
+    while (started) {
+      for (player <- players) {
+        if (!firstRound) {
+          player.pass = false
+          player.rack.addTile(getRandomTile())
           printPlayingField(player)
-          readLine() match {
-            //case player doesn´t want to set any Tile
-            case "p" =>
-              println("Player " + player.id + " passed, next Player:")
-              player.pass = true
 
-            //case player want to check for possible moves
-            case "c" =>
-              checkMoves(player)
-            //case player wants to exit game
-            case "q" =>
-              println("Game aborted!")
-              started = false
-              abortGame()
+          //while not passing its your turn
+          while (!player.pass) {
+            var input: String = readLine()
 
-            // invalid imput
-            case _ => println("invalid Input")
+            input match {
+              //case player doesn´t want to set any Tile
+              case "p" =>
+                println("passed, next Player:")
+                player.pass = true
+
+              //case player want to set a Tile
+              case "s" =>
+                //TODO implement Method for setting Tiles
+
+                println("set all possible Tiles")
+                for (tileSet <- checkMoves(player.rack)) {
+                  playingfield.playTileSet(tileSet)
+                  //TODO deleting Tiles in PlayingField umsetzen ?
+                  for (tile <- tileSet.tiles) player.rack.removeTile(tile)
+                }
+                printPlayingField(player)
+
+              //case player wants to exit game
+              case "q" =>
+                abortGame(player)
+                return
+              // invalid imput
+              case _ => println("invalid Input")
+
+            }
           }
+        }
+        else {
+          if(player.id == starter.id-1) firstRound = false
         }
       }
     }
   }
 
-  def abortGame(): Unit = {
+  def abortGame(p : Player): Unit = {
     // Exits the game loop
-    println("Implement abort game method.")
+    println("Game aborted, by player " + p.id + "!")
+    started = false
   }
 
   // Initializes the pool and sets all the available stones in it
@@ -84,7 +103,7 @@ class Game(_numberOfPlayers: Int) {
       }
     }
 
-    def matchColor(x: Int) : String = x match {
+    def matchColor(x: Int): String = x match {
       case 1 => red
       case 2 => blue
       case 3 => yellow
@@ -103,20 +122,58 @@ class Game(_numberOfPlayers: Int) {
 
   //Initializes the players
   def initializePlayers(): Unit = {
-    for(i <- 1 to numberOfPlayers){
+    for (i <- 1 to numberOfPlayers) {
       var player = new Player(initializeRack(), i)
       //player.print()
       players.+=(player)
     }
   }
 
-  //Initializes the rack and set random Tiles
-  def initializeRack() : Rack = {
-    var tiles : Set[Tile] = Set()
-    for(i <- 1 to 14){
+  //Initializes the rack and set random Tiles  def initializeRack() : Rack = {
+  def initializeRack(): Rack = {
+    var tiles: Set[Tile] = Set()
+    for (i <- 1 to 14) {
       tiles.+=(getRandomTile())
     }
     new Rack(tiles.toList) // Implicit return statement
+  }
+
+  def gambleForStartingPositon(): Player = {
+
+    println("Gambling for the starting position.")
+
+    var starter: List[Player] = List()
+    var jokerPicked = false
+
+    // Repeat if two player pick the same number or a joker has been picked
+    do {
+      starter = List()
+      jokerPicked = false
+      var initTiles: List[Tile] = List()
+      // Initial picking of numbers
+      players.foreach(p => {
+        val tile = p.pickInitTile(getRandomTile())
+        initTiles.::=(tile)
+        println("Player " + p.id + " picked: ")
+        tile.printTile()
+      })
+      val maxByVal = initTiles.maxBy(tile => tile.number)
+      players.foreach(p => {
+        if (p.initTile.number == maxByVal.number) {
+          starter.::=(p)
+        }
+        if (p.initTile.number == 0) {
+          jokerPicked = true
+        }
+      })
+      if (jokerPicked) println("Joker picked. Repeating start.")
+      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
+    } while (starter.count(p => true) > 1 || jokerPicked)
+
+    val startPlayer = starter.head
+    print("Player " + startPlayer.id + " starts.")
+    startPlayer
+
   }
 
   //take a random Tile out of the pool
@@ -124,37 +181,38 @@ class Game(_numberOfPlayers: Int) {
     //TODO get Random Tile from pool
     val num = new Random().nextInt(pool.size)
     var i = 0: Int
-    for (t <- pool){
-      if(i==num){
+    for (t <- pool) {
+      if (i == num) {
         pool.-=(t)
         return t
       }
-      i=i+1
-      null
+      i = i + 1
     }
     //if no Tiles in pool
     //TODO handle no Tiles in pool
-    null
-  }
-
-  // prints the whole pool
-  def printPool(): Unit = {
-    for (t <- pool) t.printTile()
-    //pool.foreach((t: Tile) => t.printTile())
+    null // Implicit return statement
   }
 
   //prints the Playingfield for the specific Player
-  def printPlayingField(player: Player): Unit ={
-    println("\n\n\n##########################################################################################")
+  def printPlayingField(player: Player): Unit = {
+    println("\n\n\n\n\n##########################################################################################")
     println("Played Tile Sets:")
-    for(playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
+    for (playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
     println("##########################################################################################")
     println("Your Rack, Player " + player.id)
     player.rack.sortNumbers()
     player.rack.sortColors()
     utils.printTilesHorizontally(player.rack.tiles)
     println("##########################################################################################")
-    println("p: Pass move, c: Check moves, q:Quit Game")
+    println("p: Pass, s: Set Tile(s), q:Quit Game")
+  }
+
+  //check if Rack contains a street or a Set
+  def checkMoves(rack: Rack): List[TileSet] = {
+    var tileSets: List[TileSet] = List[TileSet]()
+    tileSets = tileSets.:::(checkSeries(rack))
+    tileSets = tileSets.:::(checkSet(rack))
+    return tileSets
   }
 
   //checking for same colored series in the rack
@@ -170,15 +228,15 @@ class Game(_numberOfPlayers: Int) {
     rack.sortNumbers()
     rack.sortColors()
     //set first color
-    color=rack.tiles.head.color
+    color = rack.tiles.head.color
     for (tile <- rack.tiles) {
       if (color == tile.color) {
-        if (tile.number == number+1){
+        if (tile.number == number + 1) {
           count.+=(1)
           number.+=(1)
           tiles = tiles.::(tile)
         }
-        else if (tile.number == number){
+        else if (tile.number == number) {
           //nothing to do
         }
         else {
@@ -192,8 +250,8 @@ class Game(_numberOfPlayers: Int) {
         tiles = List[Tile]().::(tile)
         number = tile.number
       }
-      if(count >= 3){
-        tileSets = tileSets.::(new TileSet(tiles,true))
+      if (count >= 3) {
+        tileSets = tileSets.::(new TileSet(tiles, true))
       }
     }
     return tileSets
@@ -207,7 +265,7 @@ class Game(_numberOfPlayers: Int) {
     var tiles: List[Tile] = List[Tile]()
     var number: Int = 0
     var count: Int = 0
-    var tilesToSet =List[Tile]()
+    var tilesToSet = List[Tile]()
 
     rack.sortNumbers()
     for (tile <- rack.tiles) {
@@ -219,54 +277,17 @@ class Game(_numberOfPlayers: Int) {
         count = 1
         tiles = List[Tile]().::(tile)
       }
-      if(count >= 3){
-        tileSets = tileSets.::(new TileSet(tiles,false))
+      if (count >= 3) {
+        tileSets = tileSets.::(new TileSet(tiles, false))
       }
     }
     return tileSets
   }
 
-  //check if Rack contains a street or a Set
-  def checkMoves(player: Player): Unit = {
-    var tileSets: List[TileSet] = List[TileSet]()
-    tileSets = tileSets.:::(checkSeries(player.rack))
-    tileSets = tileSets.:::(checkSet(player.rack))
-    if (tileSets.size > 0) {
-      var i = 0: Int
-      for (tileSet <- tileSets) {
-        i = i + 1
-        println("press \"s" + i + "\" to play Tileset:")
-        utils.printTilesHorizontally(tileSet.tiles)
-      }
-      println("##########################################################################################")
-      println("p: Pass move, s#: Play TileSet number #")
-    } else {
-      println("No possible moves detekted! Press \"p\" to pass move.")
-    }
-    var input = readLine()
-    input match {
-      //case player doesn´t want to set any Tile
-      case "p" =>
-        println("Player " + player.id + " passed, next Player:")
-        player.pass = true
-      case _ =>
-        input.toList match {
-          case 's' :: tileNumber :: Nil =>
-            var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 0: Int
-            for (tileSet <- tileSets) {
-              if (i == (number - 1)) {
-                playingfield.playTileSet(tileSet)
-                for (tile <- tileSet.tiles) {
-                  player.rack.removeTile(tile)
-                }
-              }
-              i = i + 1
-            }
-            printPlayingField(player)
-          case _ => println("False Input!!!")
-        }
-    }
+  // prints the whole pool
+  def printPool(): Unit = {
+    for (t <- pool) t.printTile()
+    //pool.foreach((t: Tile) => t.printTile())
   }
 }
 
