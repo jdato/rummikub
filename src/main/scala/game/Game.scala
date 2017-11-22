@@ -32,30 +32,18 @@ class Game(_numberOfPlayers: Int) {
       for(player<-players){
         player.pass = false
         player.rack.addTile(getRandomTile())
-        printPlayingField(player)
-
         //while not passing its your turn
         while(!player.pass){
-          var input:String = readLine()
-
-          input match {
+          printPlayingField(player)
+          readLine() match {
             //case player doesn´t want to set any Tile
             case "p" =>
-              println("passed, next Player:")
+              println("Player " + player.id + " passed, next Player:")
               player.pass = true
 
-            //case player want to set a Tile
-            case "s" =>
-              //TODO implement Method for setting Tiles
-
-              println("set all possible Tiles")
-              for(tileSet<-checkMoves(player.rack)){
-                playingfield.playTileSet(tileSet)
-                //TODO deleting Tiles in PlayingField umsetzen ?
-                for(tile<-tileSet.tiles) player.rack.removeTile(tile)
-              }
-              printPlayingField(player)
-
+            //case player want to check for possible moves
+            case "c" =>
+              checkMoves(player)
             //case player wants to exit game
             case "q" =>
               println("Game aborted!")
@@ -157,7 +145,7 @@ class Game(_numberOfPlayers: Int) {
 
   //prints the Playingfield for the specific Player
   def printPlayingField(player: Player): Unit ={
-    println("\n\n\n\n\n##########################################################################################")
+    println("\n\n\n##########################################################################################")
     println("Played Tile Sets:")
     for(playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
     println("##########################################################################################")
@@ -166,7 +154,7 @@ class Game(_numberOfPlayers: Int) {
     player.rack.sortColors()
     utils.printTilesHorizontally(player.rack.tiles)
     println("##########################################################################################")
-    println("p: Pass, s: Set Tile(s), q:Quit Game")
+    println("p: Pass move, c: Check moves, q:Quit Game")
   }
 
   //checking for same colored series in the rack
@@ -239,11 +227,46 @@ class Game(_numberOfPlayers: Int) {
   }
 
   //check if Rack contains a street or a Set
-  def checkMoves(rack: Rack): List[TileSet] = {
+  def checkMoves(player: Player): Unit = {
     var tileSets: List[TileSet] = List[TileSet]()
-    tileSets = tileSets.:::(checkSeries(rack))
-    tileSets = tileSets.:::(checkSet(rack))
-    return tileSets
+    tileSets = tileSets.:::(checkSeries(player.rack))
+    tileSets = tileSets.:::(checkSet(player.rack))
+    if (tileSets.size > 0) {
+      var i = 0: Int
+      for (tileSet <- tileSets) {
+        i = i + 1
+        println("press \"s" + i + "\" to play Tileset:")
+        utils.printTilesHorizontally(tileSet.tiles)
+      }
+      println("##########################################################################################")
+      println("p: Pass move, s#: Play TileSet number #")
+    } else {
+      println("No possible moves detekted! Press \"p\" to pass move.")
+    }
+    var input = readLine()
+    input match {
+      //case player doesn´t want to set any Tile
+      case "p" =>
+        println("Player " + player.id + " passed, next Player:")
+        player.pass = true
+      case _ =>
+        input.toList match {
+          case 's' :: tileNumber :: Nil =>
+            var number: Int = Integer.valueOf(tileNumber.toString)
+            var i = 0: Int
+            for (tileSet <- tileSets) {
+              if (i == (number - 1)) {
+                playingfield.playTileSet(tileSet)
+                for (tile <- tileSet.tiles) {
+                  player.rack.removeTile(tile)
+                }
+              }
+              i = i + 1
+            }
+            printPlayingField(player)
+          case _ => println("False Input!!!")
+        }
+    }
   }
 }
 
