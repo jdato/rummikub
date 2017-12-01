@@ -201,7 +201,7 @@ class Game(_numberOfPlayers: Int) {
 
   //checking for same colored series in the rack
   def checkSeries(rack: Rack): List[TileSet] = {
-    //TODO method ignores jockers
+    //TODO method ignores jokers
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
 
@@ -238,7 +238,7 @@ class Game(_numberOfPlayers: Int) {
         tileSets = tileSets.::(new TileSet(tiles, true))
       }
     }
-    return tileSets
+    tileSets
   }
 
   // checking for any Sets in the rack
@@ -265,7 +265,7 @@ class Game(_numberOfPlayers: Int) {
         tileSets = tileSets.::(new TileSet(tiles, false))
       }
     }
-    return tileSets
+    tileSets
   }
 
   //check if Rack contains a street or a Set
@@ -273,7 +273,7 @@ class Game(_numberOfPlayers: Int) {
     var tileSets: List[TileSet] = List[TileSet]()
     tileSets = tileSets.:::(checkSeries(player.rack))
     tileSets = tileSets.:::(checkSet(player.rack))
-    if (tileSets.size > 0) {
+    if (tileSets.nonEmpty) {
       var i = 0: Int
       for (tileSet <- tileSets) {
         i = i + 1

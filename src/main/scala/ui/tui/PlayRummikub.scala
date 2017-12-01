@@ -1,4 +1,7 @@
+package ui.tui
+
 import game.{Game, Utils}
+
 import scala.io.StdIn
 
 /**
