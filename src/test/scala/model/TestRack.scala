@@ -88,9 +88,9 @@ class TestRack extends WordSpec {
     rack.sortColors()
     "be sorted by color" in {
       rack.printRack()
-      assert(rack.tiles.indexOf(tile1)<rack.tiles.indexOf(tile3))
-      assert(rack.tiles.indexOf(tile3)<rack.tiles.indexOf(tile4))
-      assert(rack.tiles.indexOf(tile4)<rack.tiles.indexOf(tile2))
+      assert(rack.tiles.indexOf(tile3) > rack.tiles.indexOf(tile1))
+      assert(rack.tiles.indexOf(tile1) > rack.tiles.indexOf(tile4))
+      assert(rack.tiles.indexOf(tile4) > rack.tiles.indexOf(tile2))
     }
   }
 }

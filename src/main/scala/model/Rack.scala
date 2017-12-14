@@ -6,11 +6,12 @@ package model
 class Rack(theTiles: List[Tile]){
   var tiles: List[Tile] = theTiles
 
+  //TODO currying ?!
   def sortNumbers(): Unit = {
     tiles = tiles  sortBy (_.number)
   }
   def sortColors(): Unit = {
-    tiles = tiles.sortWith((x,y) => x.color > y.color)
+    tiles = tiles.sortWith((x, y) => x.color < y.color)
   }
   def removeTile(tile: Tile): Unit = {
     if(tiles.contains(tile)) {

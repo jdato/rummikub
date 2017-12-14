@@ -199,9 +199,38 @@ class Game(_numberOfPlayers: Int) {
     println("p: Pass move, c: Check moves, q:Quit Game")
   }
 
+  def checkSum(tiles: List[Tile]): Boolean = {
+    var sum = 0
+    //TODO foldLeft(_*_) ?!
+
+    for (tile <- tiles) {
+      sum.+=(tile.number)
+    }
+    return sum >= 30
+  }
+
+  def checkAppend(tile: Tile): TileSet = {
+    for (tileSet <- playingfield.playedTileSets) {
+      if (tileSet.series) {
+        //check if tile can be added at the top or bottom
+        if (tileSet.tiles.head.color == tile.color) {
+          if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
+            return tileSet
+          }
+        }
+      } else {
+        if (tileSet.tiles.head.number == tile.number) {
+          return tileSet
+        }
+      }
+    }
+    return null
+  }
+
   //checking for same colored series in the rack
-  def checkSeries(rack: Rack): List[TileSet] = {
+  def checkSeries(player: Player): List[TileSet] = {
     //TODO method ignores jockers
+    var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
 
@@ -235,16 +264,19 @@ class Game(_numberOfPlayers: Int) {
         number = tile.number
       }
       if (count >= 3) {
-        tileSets = tileSets.::(new TileSet(tiles, true))
+        if (player.madeFirstMove || checkSum(tiles)) {
+          tileSets = tileSets.::(new TileSet(tiles, true))
+        }
       }
     }
     return tileSets
   }
 
   // checking for any Sets in the rack
-  def checkSet(rack: Rack): List[TileSet] = {
+  def checkSet(player: Player): List[TileSet] = {
     //TODO method ignores jockers and same colored Tiles
     //TODO if more than 3 Tiles are found with the same number, the method return a TileSet with 3 tiles, a TileSet with 4 Tiles,...
+    var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
     var number: Int = 0
@@ -262,29 +294,55 @@ class Game(_numberOfPlayers: Int) {
         tiles = List[Tile]().::(tile)
       }
       if (count >= 3) {
-        tileSets = tileSets.::(new TileSet(tiles, false))
+        if (player.madeFirstMove || checkSum(tiles)) {
+          tileSets = tileSets.::(new TileSet(tiles, false))
+        }
       }
     }
     return tileSets
   }
 
-  //check if Rack contains a street or a Set
+  //check the next move
   def checkMoves(player: Player): Unit = {
-    var tileSets: List[TileSet] = List[TileSet]()
-    tileSets = tileSets.:::(checkSeries(player.rack))
-    tileSets = tileSets.:::(checkSet(player.rack))
-    if (tileSets.size > 0) {
-      var i = 0: Int
-      for (tileSet <- tileSets) {
-        i = i + 1
+    var tileSetsToPlay: List[TileSet] = List[TileSet]()
+
+    //check possible moves for the player
+
+    var tilesToAppand: List[Tile] = List[Tile]()
+    tileSetsToPlay = tileSetsToPlay.:::(checkSeries(player))
+    tileSetsToPlay = tileSetsToPlay.:::(checkSet(player))
+    var i = 1: Int
+
+    if (player.madeFirstMove) {
+      for (tile <- player.rack.tiles) {
+        val tileSet = checkAppend(tile)
+        if (tileSet != null) {
+          tilesToAppand.::=(tile)
+          println("press \"a" + i + "\" to append Tile:")
+          tile.printTile()
+          println("to the TileSet:")
+          utils.printTilesHorizontally(tileSet.tiles)
+          i = i + 1
+        }
+      }
+    }
+    i = 1
+
+    if (tileSetsToPlay.size > 0 || tilesToAppand.size > 0) {
+      for (tileSet <- tileSetsToPlay) {
         println("press \"s" + i + "\" to play Tileset:")
         utils.printTilesHorizontally(tileSet.tiles)
+        i = i + 1
       }
+
       println("##########################################################################################")
-      println("p: Pass move, s#: Play TileSet number #")
+      println("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet")
     } else {
-      println("No possible moves detekted! Press \"p\" to pass move.")
+      println("No possible moves found. Press \"p\" to pass move.")
     }
+
+    //check player action
+
     var input = readLine()
     input match {
       //case player doesn´t want to set any Tile
@@ -295,13 +353,28 @@ class Game(_numberOfPlayers: Int) {
         input.toList match {
           case 's' :: tileNumber :: Nil =>
             var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 0: Int
-            for (tileSet <- tileSets) {
-              if (i == (number - 1)) {
+            var i = 1: Int
+            for (tileSet <- tileSetsToPlay) {
+              if (i == (number)) {
                 playingfield.playTileSet(tileSet)
                 for (tile <- tileSet.tiles) {
                   player.rack.removeTile(tile)
                 }
+                player.madeFirstMove = true
+              }
+              i = i + 1
+            }
+            printPlayingField(player)
+          case 'a' :: tileNumber :: Nil =>
+            var number: Int = Integer.valueOf(tileNumber.toString)
+            var i = 1: Int
+            tilesToAppand = tilesToAppand.sortWith((x, y) => x.color < y.color)
+            tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
+            for (tile <- tilesToAppand) {
+              if (i == (number)) {
+                var tileSet = checkAppend(tile)
+                tileSet.append(tile)
+                player.rack.removeTile(tile)
               }
               i = i + 1
             }

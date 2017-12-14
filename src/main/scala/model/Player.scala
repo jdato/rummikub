@@ -6,7 +6,7 @@ package model
 class Player(theRack : Rack, theId : Int) {
   var rack: Rack = theRack
   var id: Int = theId
-  val madeFirstMove: Boolean = false
+  var madeFirstMove: Boolean = false
   var pass: Boolean = true
   var initTile: Tile = new Tile("none", 0, false)
   //var name = theName
