@@ -16,7 +16,7 @@ class Game(_numberOfPlayers: Int) {
   var pool: Set[Tile] = Set[Tile]()
   var players: Set[Player] = Set()
   var started = false
-  var activePlayerId = 1
+  var win = false
 
   def startGame(): Unit = {
     // calls init method
@@ -30,34 +30,39 @@ class Game(_numberOfPlayers: Int) {
     var firstRound = true
     var starter = gambleForStartingPositon()
 
-    while (started) {
+    while (started && !win) {
       for (player <- players) {
-        if (!firstRound) {
+        if (!firstRound && started && !win) {
           player.pass = false
           player.rack.addTile(getRandomTile())
           printPlayingField(player)
 
           //while not passing its your turn
-          while (!player.pass) {
-            var input: String = readLine()
+          while (!player.pass && !win) {
+            //check if have won
+            if (player.rack.tiles.size == 0) {
+              win = true;
+              println("Congratulations Player" + player.id + ", you have won!")
+            } else {
+              var input: String = readLine()
+              input match {
+                //case player doesn´t want to set any Tile
+                case "p" =>
+                  println("passed, next Player:")
+                  player.pass = true
 
-            input match {
-              //case player doesn´t want to set any Tile
-              case "p" =>
-                println("passed, next Player:")
-                player.pass = true
+                //case player want to check for possible moves
+                case "c" =>
+                  checkMoves(player)
 
-              //case player want to check for possible moves
-              case "c" =>
-                checkMoves(player)
-              //case player wants to exit game
-              case "q" =>
-                println("Game aborted!")
-                started = false
-                abortGame(player)
-                return
-              // invalid imput
-              case _ => println("invalid Input")
+                //case player wants to exit game
+                case "q" =>
+                  started = false
+                  abortGame(player)
+
+                // invalid imput
+                case _ => println("invalid Input")
+              }
             }
           }
         }
