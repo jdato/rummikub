@@ -1,5 +1,6 @@
 package game
 
+import controller.Game
 import model.{Rack, Tile}
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec

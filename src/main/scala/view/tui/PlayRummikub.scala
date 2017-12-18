@@ -1,6 +1,7 @@
-package ui.tui
+package view.tui
 
-import game.{Game, Utils}
+import controller.{Game, Utils}
+import game.Utils
 
 import scala.io.StdIn
 
