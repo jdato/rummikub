@@ -1,5 +1,7 @@
 package view.gui
 
+import javafx.event.EventHandler
+
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.geometry.{Insets, Orientation}
@@ -10,9 +12,15 @@ import scalafx.scene.layout._
 import scalafx.scene.text.{Font, Text}
 import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 
-import scalafx.event.{ActionEvent, EventHandler}
+import controller.{Game, GraphicalGame, TextualGame}
+import view.tui.PlayRummikub.numberPlayers
+
+import scalafx.Includes._
+import scalafx.event.ActionEvent
 
 object ScalaFxGui extends JFXApp {
+
+  var numberOfPlayers = 0;
 
   lazy val splitPane = new SplitPane {
     orientation = new Orientation(Orientation.Vertical)
@@ -78,6 +86,7 @@ object ScalaFxGui extends JFXApp {
   val tog = new ToggleGroup {
     selectedToggle.onChange(
       (_, oldValue, newValue) => {
+        numberOfPlayers = newValue.asInstanceOf[JfxToggleBtn].getText.toInt
         startButton.text = "Play! (" + newValue.asInstanceOf[JfxToggleBtn].getText + ")"
         startButton.disable = false
       }
@@ -106,13 +115,14 @@ object ScalaFxGui extends JFXApp {
   val playerSelect = new VBox {
     margin = Insets.apply(10, 0, 0, 0)
     children = List(
-    new Label {
-      text = "Number of players:"
-      minWidth = 180
-      style = "-fx-font-size: 1.5em"
-    },
-    toggleGroup
-  )}
+      new Label {
+        text = "Number of players:"
+        minWidth = 180
+        style = "-fx-font-size: 1.5em"
+      },
+      toggleGroup
+    )
+  }
 
   stage = new PrimaryStage {
     title = "ScalaFX Rummikub Game"
@@ -155,7 +165,9 @@ object ScalaFxGui extends JFXApp {
     }
   }
 
-  val loadAction = EventHandler
+  startButton.onAction = (event: ActionEvent) => {
+    var game = new Game(numberOfPlayers, new GraphicalGame)
+    game.startGame()
+  }
 
-  //startButton.onAction = loadAction
 }

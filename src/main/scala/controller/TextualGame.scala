@@ -1,6 +1,8 @@
 package controller
 
-import model.{Player, Playingfield, TileSet}
+import java.util.Random
+
+import model.{Player, Playingfield, Tile, TileSet}
 
 import scala.io.StdIn
 
@@ -87,5 +89,53 @@ class TextualGame extends GameTrait {
     utils.printTilesHorizontally(player.rack.tiles)
     println("##########################################################################################")
     println("p: Pass move, c: Check moves, q:Quit Game")
+  }
+
+  def gambleForStartingPositon(players: Set[Player], pool: Set[Tile]): Player = {
+
+    println("Gambling for the starting position.")
+
+    var starter: List[Player] = List()
+    var jokerPicked = false
+
+    // Repeat if two player pick the same number or a joker has been picked
+    do {
+      starter = List()
+      jokerPicked = false
+      var initTiles: List[Tile] = List()
+      // Initial picking of numbers
+      players.foreach(p => {
+        val tile = p.pickInitTile(pickRandomTile(pool))
+        initTiles.::=(tile)
+        println("Player " + p.id + " picked: ")
+        tile.printTile()
+      })
+      val maxByVal = initTiles.maxBy(tile => tile.number)
+      players.foreach(p => {
+        if (p.initTile.number == maxByVal.number) {
+          starter.::=(p)
+        }
+        if (p.initTile.number == 0) {
+          jokerPicked = true
+        }
+      })
+      if (jokerPicked) println("Joker picked. Repeating start.")
+      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
+    } while (starter.count(p => true) > 1 || jokerPicked)
+
+    val startPlayer = starter.head
+    startPlayer
+  }
+
+  def pickRandomTile(tiles: Set[Tile]): Tile = {
+    val num = new Random().nextInt(tiles.size)
+    var i = 0: Int
+    for (t <- tiles) {
+      if (i == num) {
+        return t
+      }
+      i = i + 1
+    }
+    null
   }
 }

@@ -4,8 +4,6 @@ import java.util.Random
 
 import model._
 
-import scala.io.StdIn
-
 /**
   * Created by johannesdato on 10.11.17.
   */
@@ -31,7 +29,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     started = true
 
     var firstRound = true
-    var starter = gambleForStartingPositon()
+    var starter = gameType.gambleForStartingPositon(players, pool)
     print("Player " + starter.id + " starts.")
     val positionBeforeStarter = selectStarterPosition(starter.id)
 
@@ -40,13 +38,14 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
         if (!firstRound) {
           player.pass = false
           player.rack.addTile(pickRandomTileFromPool())
+
           gameType.printPlayingField(player, playingfield)
 
           started = gameType.play(player, playingfield, checkMoves)
-          if(!started) abortGame(player)
+          if (!started) abortGame(player)
         }
         else {
-          if(player.id == positionBeforeStarter) firstRound = false
+          if (player.id == positionBeforeStarter) firstRound = false
         }
       }
     }
@@ -59,7 +58,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     case 4 => 3
   }
 
-  def abortGame(p : Player): Unit = {
+  def abortGame(p: Player): Unit = {
     // Exits the game loop
     println("Game aborted, by player " + p.id + "!")
     started = false
@@ -205,47 +204,6 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
       }
     }
     tileSets
-  }
-
-
-
-
-  // TUI Logic
-
-  def gambleForStartingPositon(): Player = {
-
-    println("Gambling for the starting position.")
-
-    var starter: List[Player] = List()
-    var jokerPicked = false
-
-    // Repeat if two player pick the same number or a joker has been picked
-    do {
-      starter = List()
-      jokerPicked = false
-      var initTiles: List[Tile] = List()
-      // Initial picking of numbers
-      players.foreach(p => {
-        val tile = p.pickInitTile(pickRandomTileFromPool())
-        initTiles.::=(tile)
-        println("Player " + p.id + " picked: ")
-        tile.printTile()
-      })
-      val maxByVal = initTiles.maxBy(tile => tile.number)
-      players.foreach(p => {
-        if (p.initTile.number == maxByVal.number) {
-          starter.::=(p)
-        }
-        if (p.initTile.number == 0) {
-          jokerPicked = true
-        }
-      })
-      if (jokerPicked) println("Joker picked. Repeating start.")
-      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
-    } while (starter.count(p => true) > 1 || jokerPicked)
-
-    val startPlayer = starter.head
-    startPlayer
   }
 
   //check if Rack contains a street or a Set
