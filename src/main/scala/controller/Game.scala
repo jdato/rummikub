@@ -9,10 +9,11 @@ import scala.io.StdIn
 /**
   * Created by johannesdato on 10.11.17.
   */
-class Game(_numberOfPlayers: Int) {
+class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
 
   var playingfield: Playingfield = new Playingfield
-  var numberOfPlayers: Int = _numberOfPlayers
+  val numberOfPlayers: Int = _numberOfPlayers
+  val gameType: GameTrait = _gameType
   var utils: Utils = new Utils
 
   var pool: Set[Tile] = Set[Tile]()
@@ -31,43 +32,31 @@ class Game(_numberOfPlayers: Int) {
 
     var firstRound = true
     var starter = gambleForStartingPositon()
+    print("Player " + starter.id + " starts.")
+    val positionBeforeStarter = selectStarterPosition(starter.id)
 
     while (started) {
       for (player <- players) {
         if (!firstRound) {
           player.pass = false
           player.rack.addTile(pickRandomTileFromPool())
-          printPlayingField(player)
+          gameType.printPlayingField(player, playingfield)
 
-          //while not passing its your turn
-          while (!player.pass) {
-            var input: String = StdIn.readLine()
-
-            input match {
-              //case player doesn´t want to set any Tile
-              case "p" =>
-                println("passed, next Player:")
-                player.pass = true
-
-              //case player want to check for possible moves
-              case "c" =>
-                checkMoves(player)
-              //case player wants to exit game
-              case "q" =>
-                println("Game aborted!")
-                started = false
-                abortGame(player)
-                return
-              // invalid imput
-              case _ => println("invalid Input")
-            }
-          }
+          started = gameType.play(player, playingfield, checkMoves)
+          if(!started) abortGame(player)
         }
         else {
-          if(player.id == starter.id-1) firstRound = false
+          if(player.id == positionBeforeStarter) firstRound = false
         }
       }
     }
+  }
+
+  def selectStarterPosition(starter: Int): Int = starter match {
+    case 1 => numberOfPlayers
+    case 2 => 1
+    case 3 => 2
+    case 4 => 3
   }
 
   def abortGame(p : Player): Unit = {
@@ -256,65 +245,14 @@ class Game(_numberOfPlayers: Int) {
     } while (starter.count(p => true) > 1 || jokerPicked)
 
     val startPlayer = starter.head
-    print("Player " + startPlayer.id + " starts.")
     startPlayer
-
   }
 
   //check if Rack contains a street or a Set
-  def checkMoves(player: Player): Unit = {
+  def checkMoves(player: Player): List[TileSet] = {
     var tileSets: List[TileSet] = List[TileSet]()
     tileSets = tileSets.:::(checkSeries(player.rack))
     tileSets = tileSets.:::(checkSet(player.rack))
-    if (tileSets.nonEmpty) {
-      var i = 0: Int
-      for (tileSet <- tileSets) {
-        i = i + 1
-        println("press \"s" + i + "\" to play Tileset:")
-        utils.printTilesHorizontally(tileSet.tiles)
-      }
-      println("##########################################################################################")
-      println("p: Pass move, s#: Play TileSet number #")
-    } else {
-      println("No possible moves detekted! Press \"p\" to pass move.")
-    }
-    var input = StdIn.readLine()
-    input match {
-      //case player doesn´t want to set any Tile
-      case "p" =>
-        println("Player " + player.id + " passed, next Player:")
-        player.pass = true
-      case _ =>
-        input.toList match {
-          case 's' :: tileNumber :: Nil =>
-            var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 0: Int
-            for (tileSet <- tileSets) {
-              if (i == (number - 1)) {
-                playingfield.playTileSet(tileSet)
-                for (tile <- tileSet.tiles) {
-                  player.rack.removeTile(tile)
-                }
-              }
-              i = i + 1
-            }
-            printPlayingField(player)
-          case _ => println("False Input!!!")
-        }
-    }
-  }
-
-  //prints the Playingfield for the specific Player
-  def printPlayingField(player: Player): Unit = {
-    println("\n\n\n##########################################################################################")
-    println("Played Tile Sets:")
-    for (playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
-    println("##########################################################################################")
-    println("Your Rack, Player " + player.id)
-    player.rack.sortNumbers()
-    player.rack.sortColors()
-    utils.printTilesHorizontally(player.rack.tiles)
-    println("##########################################################################################")
-    println("p: Pass move, c: Check moves, q:Quit Game")
+    tileSets
   }
 }

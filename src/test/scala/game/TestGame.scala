@@ -1,6 +1,6 @@
 package game
 
-import controller.Game
+import controller.{Game, TextualGame}
 import model.{Rack, Tile}
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
@@ -9,7 +9,7 @@ class TestGame extends WordSpec {
 
   "checking for Series" should {
     var tiles : List[Tile]= List()
-    var game : Game = new Game(2)
+    var game : Game = new Game(2, new TextualGame)
 
     val rack = new Rack(tiles)
     val tile1 = new Tile("red", 1, false)
@@ -28,7 +28,7 @@ class TestGame extends WordSpec {
   }
   "checking for Set" should {
     var tiles : List[Tile]= List()
-    var game : Game = new Game(2)
+    var game : Game = new Game(2, new TextualGame)
 
     val rack = new Rack(tiles)
     val tile1 = new Tile("red", 1, false)
