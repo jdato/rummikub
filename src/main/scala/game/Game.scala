@@ -38,7 +38,7 @@ class Game(_numberOfPlayers: Int) {
           printPlayingField(player)
 
           //while not passing its your turn
-          while (!player.pass && !win) {
+          while (!player.pass && !win && started) {
             //check if have won
             if (player.rack.tiles.size == 0) {
               win = true;
@@ -57,7 +57,6 @@ class Game(_numberOfPlayers: Int) {
 
                 //case player wants to exit game
                 case "q" =>
-                  started = false
                   abortGame(player)
 
                 // invalid imput
@@ -108,12 +107,13 @@ class Game(_numberOfPlayers: Int) {
       case _ => "no color"
     }
 
-    // Add the jokers
-    val joker = new Tile(red, 0, true)
-    pool.+=(joker)
-    joker.color = black
-    pool.+=(joker)
-
+    /* Joker funktionieren noch nicht
+        // Add the jokers
+        val joker = new Tile(red, 0, true)
+        pool.+=(joker)
+        joker.color = black
+        pool.+=(joker)
+    */
     println("Pool initialized.")
   }
 
@@ -173,21 +173,13 @@ class Game(_numberOfPlayers: Int) {
 
   }
 
+  //TODO handle no Tiles in pool
   //take a random Tile out of the pool
   def getRandomTile(): Tile = {
-    //TODO get Random Tile from pool
-    val num = new Random().nextInt(pool.size)
-    var i = 0: Int
-    for (t <- pool) {
-      if (i == num) {
-        pool.-=(t)
-        return t
-      }
-      i = i + 1
-    }
-    //if no Tiles in pool
-    //TODO handle no Tiles in pool
-    null // Implicit return statement
+    var poolArray = pool.toArray
+    var tile = poolArray(new Random().nextInt(pool.size))
+    pool.-=(tile)
+    return tile
   }
 
   //prints the Playingfield for the specific Player
@@ -205,13 +197,7 @@ class Game(_numberOfPlayers: Int) {
   }
 
   def checkSum(tiles: List[Tile]): Boolean = {
-    var sum = 0
-    //TODO foldLeft(_*_) ?!
-
-    for (tile <- tiles) {
-      sum.+=(tile.number)
-    }
-    return sum >= 30
+    return tiles.foldLeft(0) { (z, i) => z + i.number } >= 30
   }
 
   def checkAppend(tile: Tile): TileSet = {
@@ -280,7 +266,6 @@ class Game(_numberOfPlayers: Int) {
   // checking for any Sets in the rack
   def checkSet(player: Player): List[TileSet] = {
     //TODO method ignores jockers and same colored Tiles
-    //TODO if more than 3 Tiles are found with the same number, the method return a TileSet with 3 tiles, a TileSet with 4 Tiles,...
     var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
