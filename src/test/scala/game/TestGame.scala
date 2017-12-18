@@ -1,7 +1,7 @@
 package game
 
 import controller.{Game, TextualGame}
-import model.{Rack, Tile}
+import model.{Player, Rack, Tile}
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 
@@ -18,12 +18,13 @@ class TestGame extends WordSpec {
     rack.addTile(tile1)
     rack.addTile(tile2)
     rack.addTile(tile3)
+    var player = new Player(rack, 0)
 
     "give back a TileSet" in {
-      assert(game.checkSeries(rack).nonEmpty)
+      assert(game.checkSeries(player).nonEmpty)
     }
     "have the Flag \"isSeries\"" in {
-      assert(game.checkSeries(rack).head.series)
+      assert(game.checkSeries(player).head.series)
     }
   }
   "checking for Set" should {
@@ -37,12 +38,13 @@ class TestGame extends WordSpec {
     rack.addTile(tile1)
     rack.addTile(tile2)
     rack.addTile(tile3)
+    var player = new Player(rack, 0)
 
     "give back a TileSet" in {
-      assert(game.checkSet(rack).nonEmpty)
+      assert(game.checkSet(player).nonEmpty)
     }
     "have the Flag \"isSeries\"" in {
-      assert(!game.checkSet(rack).head.series)
+      assert(!game.checkSet(player).head.series)
     }
   }
 }

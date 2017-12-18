@@ -38,9 +38,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
         if (!firstRound) {
           player.pass = false
           player.rack.addTile(pickRandomTileFromPool())
-
           gameType.printPlayingField(player, playingfield)
-
           started = gameType.play(player, playingfield, checkMoves)
           if (!started) abortGame(player)
         }
@@ -122,24 +120,16 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
 
   //take a random Tile out of the pool
   def pickRandomTileFromPool(): Tile = {
-    //TODO get Random Tile from pool
-    val num = new Random().nextInt(pool.size)
-    var i = 0: Int
-    for (t <- pool) {
-      if (i == num) {
-        pool.-=(t)
-        return t
-      }
-      i = i + 1
-    }
-    //if no Tiles in pool
-    //TODO handle no Tiles in pool
-    null // Implicit return statement
+    var poolArray = pool.toArray
+    var tile = poolArray(new Random().nextInt(pool.size))
+    pool.-=(tile)
+    return tile
   }
 
   //checking for same colored series in the rack
-  def checkSeries(rack: Rack): List[TileSet] = {
-    //TODO method ignores jokers
+  def checkSeries(player: Player): List[TileSet] = {
+    //TODO method ignores jockers
+    var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
 
@@ -173,16 +163,18 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
         number = tile.number
       }
       if (count >= 3) {
-        tileSets = tileSets.::(new TileSet(tiles, true))
+        if (player.madeFirstMove || checkSum(tiles)) {
+          tileSets = tileSets.::(new TileSet(tiles, true))
+        }
       }
     }
-    tileSets
+    return tileSets
   }
 
   // checking for any Sets in the rack
-  def checkSet(rack: Rack): List[TileSet] = {
+  def checkSet(player: Player): List[TileSet] = {
     //TODO method ignores jockers and same colored Tiles
-    //TODO if more than 3 Tiles are found with the same number, the method return a TileSet with 3 tiles, a TileSet with 4 Tiles,...
+    var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
     var number: Int = 0
@@ -200,17 +192,44 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
         tiles = List[Tile]().::(tile)
       }
       if (count >= 3) {
-        tileSets = tileSets.::(new TileSet(tiles, false))
+        if (player.madeFirstMove || checkSum(tiles)) {
+          tileSets = tileSets.::(new TileSet(tiles, false))
+        }
       }
     }
-    tileSets
+    return tileSets
   }
+
+  // check if player has 30 Points
+  def checkSum(tiles: List[Tile]): Boolean = {
+    return tiles.foldLeft(0) { (z, i) => z + i.number } >= 30
+  }
+
+  /*
+    def checkAppend(tile: Tile): TileSet = {
+      for (tileSet <- playingfield.playedTileSets) {
+        if (tileSet.series) {
+          //check if tile can be added at the top or bottom
+          if (tileSet.tiles.head.color == tile.color) {
+            if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
+              return tileSet
+            }
+          }
+        } else {
+          if (tileSet.tiles.head.number == tile.number) {
+            return tileSet
+          }
+        }
+      }
+      return null
+    }
+  */
 
   //check if Rack contains a street or a Set
   def checkMoves(player: Player): List[TileSet] = {
     var tileSets: List[TileSet] = List[TileSet]()
-    tileSets = tileSets.:::(checkSeries(player.rack))
-    tileSets = tileSets.:::(checkSet(player.rack))
+    tileSets = tileSets.:::(checkSeries(player))
+    tileSets = tileSets.:::(checkSet(player))
     tileSets
   }
 }
