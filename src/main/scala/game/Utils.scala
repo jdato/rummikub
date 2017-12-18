@@ -29,7 +29,3 @@ class Utils {
     print(color + string + "\u001B[0m")
   }
 }
-
-object Utils {
-
-}

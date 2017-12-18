@@ -20,8 +20,3 @@ class Player(theRack : Rack, theId : Int) {
     initTile
   }
 }
-
-
-object Player {
-
-}

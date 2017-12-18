@@ -18,7 +18,3 @@ class TileSet(theTiles : List[Tile], isSeries : Boolean) {
     println("Implement reduce method.")
   }
 }
-
-object TileSet {
-
-}

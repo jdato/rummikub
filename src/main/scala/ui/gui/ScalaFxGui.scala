@@ -10,6 +10,8 @@ import scalafx.scene.layout._
 import scalafx.scene.text.{Font, Text}
 import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 
+import scalafx.event.{ActionEvent, EventHandler}
+
 object ScalaFxGui extends JFXApp {
 
   lazy val splitPane = new SplitPane {
@@ -81,7 +83,6 @@ object ScalaFxGui extends JFXApp {
       }
     )
   }
-
   val toggleGroup = new HBox {
     margin = Insets.apply(0, 0, 0, 12)
     spacing = 2
@@ -102,7 +103,6 @@ object ScalaFxGui extends JFXApp {
         toggleGroup = tog
       })
   }
-
   val playerSelect = new VBox {
     margin = Insets.apply(10, 0, 0, 0)
     children = List(
@@ -113,8 +113,6 @@ object ScalaFxGui extends JFXApp {
     },
     toggleGroup
   )}
-
-  val toggleLabel = new TextField
 
   stage = new PrimaryStage {
     title = "ScalaFX Rummikub Game"
@@ -156,4 +154,8 @@ object ScalaFxGui extends JFXApp {
       } // End of root BorderPane
     }
   }
+
+  val loadAction = EventHandler
+
+  //startButton.onAction = loadAction
 }

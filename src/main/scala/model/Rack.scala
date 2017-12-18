@@ -24,7 +24,3 @@ class Rack(theTiles: List[Tile]){
     for (t <- tiles) t.printTile()
   }
 }
-
-object Rack {
-
-}

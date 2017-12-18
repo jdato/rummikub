@@ -7,10 +7,6 @@ import scala.io.StdIn
 /**
   * Created by johannesdato on 10.11.17.
   */
-class PlayRummikub {
-
-}
-
 object PlayRummikub extends App {
 
   println("Welcome to the Rummikub Scala Game!")

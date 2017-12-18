@@ -20,7 +20,3 @@ class Tile(theColor : String, theNumber : Int = 0, isJoker : Boolean) {
     print("| ® |\n --- \n" + reset)
   }
 }
-
-object Tile {
-
-}

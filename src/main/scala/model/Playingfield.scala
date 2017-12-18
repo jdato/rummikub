@@ -10,7 +10,3 @@ class Playingfield {
     playedTileSets.::=(tileSet)
   }
 }
-
-object Playingfield {
-
-}

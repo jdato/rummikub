@@ -4,6 +4,8 @@ import java.util.Random
 
 import model._
 
+import scala.io.StdIn
+
 /**
   * Created by johannesdato on 10.11.17.
   */
@@ -34,12 +36,12 @@ class Game(_numberOfPlayers: Int) {
       for (player <- players) {
         if (!firstRound) {
           player.pass = false
-          player.rack.addTile(getRandomTile())
+          player.rack.addTile(pickRandomTileFromPool())
           printPlayingField(player)
 
           //while not passing its your turn
           while (!player.pass) {
-            var input: String = readLine()
+            var input: String = StdIn.readLine()
 
             input match {
               //case player doesn´t want to set any Tile
@@ -125,51 +127,13 @@ class Game(_numberOfPlayers: Int) {
   def initializeRack(): Rack = {
     var tiles: Set[Tile] = Set()
     for (i <- 1 to 14) {
-      tiles.+=(getRandomTile())
+      tiles.+=(pickRandomTileFromPool())
     }
     new Rack(tiles.toList) // Implicit return statement
   }
 
-  def gambleForStartingPositon(): Player = {
-
-    println("Gambling for the starting position.")
-
-    var starter: List[Player] = List()
-    var jokerPicked = false
-
-    // Repeat if two player pick the same number or a joker has been picked
-    do {
-      starter = List()
-      jokerPicked = false
-      var initTiles: List[Tile] = List()
-      // Initial picking of numbers
-      players.foreach(p => {
-        val tile = p.pickInitTile(getRandomTile())
-        initTiles.::=(tile)
-        println("Player " + p.id + " picked: ")
-        tile.printTile()
-      })
-      val maxByVal = initTiles.maxBy(tile => tile.number)
-      players.foreach(p => {
-        if (p.initTile.number == maxByVal.number) {
-          starter.::=(p)
-        }
-        if (p.initTile.number == 0) {
-          jokerPicked = true
-        }
-      })
-      if (jokerPicked) println("Joker picked. Repeating start.")
-      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
-    } while (starter.count(p => true) > 1 || jokerPicked)
-
-    val startPlayer = starter.head
-    print("Player " + startPlayer.id + " starts.")
-    startPlayer
-
-  }
-
   //take a random Tile out of the pool
-  def getRandomTile(): Tile = {
+  def pickRandomTileFromPool(): Tile = {
     //TODO get Random Tile from pool
     val num = new Random().nextInt(pool.size)
     var i = 0: Int
@@ -183,20 +147,6 @@ class Game(_numberOfPlayers: Int) {
     //if no Tiles in pool
     //TODO handle no Tiles in pool
     null // Implicit return statement
-  }
-
-  //prints the Playingfield for the specific Player
-  def printPlayingField(player: Player): Unit = {
-    println("\n\n\n##########################################################################################")
-    println("Played Tile Sets:")
-    for (playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
-    println("##########################################################################################")
-    println("Your Rack, Player " + player.id)
-    player.rack.sortNumbers()
-    player.rack.sortColors()
-    utils.printTilesHorizontally(player.rack.tiles)
-    println("##########################################################################################")
-    println("p: Pass move, c: Check moves, q:Quit Game")
   }
 
   //checking for same colored series in the rack
@@ -268,6 +218,49 @@ class Game(_numberOfPlayers: Int) {
     tileSets
   }
 
+
+
+
+  // TUI Logic
+
+  def gambleForStartingPositon(): Player = {
+
+    println("Gambling for the starting position.")
+
+    var starter: List[Player] = List()
+    var jokerPicked = false
+
+    // Repeat if two player pick the same number or a joker has been picked
+    do {
+      starter = List()
+      jokerPicked = false
+      var initTiles: List[Tile] = List()
+      // Initial picking of numbers
+      players.foreach(p => {
+        val tile = p.pickInitTile(pickRandomTileFromPool())
+        initTiles.::=(tile)
+        println("Player " + p.id + " picked: ")
+        tile.printTile()
+      })
+      val maxByVal = initTiles.maxBy(tile => tile.number)
+      players.foreach(p => {
+        if (p.initTile.number == maxByVal.number) {
+          starter.::=(p)
+        }
+        if (p.initTile.number == 0) {
+          jokerPicked = true
+        }
+      })
+      if (jokerPicked) println("Joker picked. Repeating start.")
+      if (starter.count(p => true) > 1) println("More than one highest tile. Repeating start.")
+    } while (starter.count(p => true) > 1 || jokerPicked)
+
+    val startPlayer = starter.head
+    print("Player " + startPlayer.id + " starts.")
+    startPlayer
+
+  }
+
   //check if Rack contains a street or a Set
   def checkMoves(player: Player): Unit = {
     var tileSets: List[TileSet] = List[TileSet]()
@@ -285,7 +278,7 @@ class Game(_numberOfPlayers: Int) {
     } else {
       println("No possible moves detekted! Press \"p\" to pass move.")
     }
-    var input = readLine()
+    var input = StdIn.readLine()
     input match {
       //case player doesn´t want to set any Tile
       case "p" =>
@@ -310,9 +303,18 @@ class Game(_numberOfPlayers: Int) {
         }
     }
   }
+
+  //prints the Playingfield for the specific Player
+  def printPlayingField(player: Player): Unit = {
+    println("\n\n\n##########################################################################################")
+    println("Played Tile Sets:")
+    for (playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
+    println("##########################################################################################")
+    println("Your Rack, Player " + player.id)
+    player.rack.sortNumbers()
+    player.rack.sortColors()
+    utils.printTilesHorizontally(player.rack.tiles)
+    println("##########################################################################################")
+    println("p: Pass move, c: Check moves, q:Quit Game")
+  }
 }
-
-object Game {
-
-}
-
