@@ -10,7 +10,7 @@ class Rack(theTiles: List[Tile]){
     tiles = tiles  sortBy (_.number)
   }
   def sortColors(): Unit = {
-    tiles = tiles.sortWith((x,y) => x.color > y.color)
+    tiles = tiles.sortWith((x, y) => x.color < y.color)
   }
   def removeTile(tile: Tile): Unit = {
     if(tiles.contains(tile)) {

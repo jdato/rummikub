@@ -12,6 +12,15 @@ class TextualGame extends GameTrait {
 
   override def play(player: Player, playingfield: Playingfield, checkMoves: Player => List[TileSet]): Boolean = {
     var abort = false
+    player.pass = false
+
+    //TODO eher schlechter Punkt um Sieg prüfen
+    if (player.rack.tiles.size == 0) {
+      abort = true
+      println("Congratulations Player" + player.id + ", you have won!")
+      false
+    }
+
     //while not passing its your turn
     while (!player.pass) {
       var input: String = StdIn.readLine()
@@ -38,20 +47,35 @@ class TextualGame extends GameTrait {
 
   override def playMove(possibleMoves: List[TileSet], player: Player, playingfield: Playingfield): Unit = {
 
-    if (possibleMoves.nonEmpty) {
-      var i = 0: Int
+    var i = 1: Int
+    var tilesToAppand: List[Tile] = List[Tile]()
+    if (player.madeFirstMove) {
+      for (tile <- player.rack.tiles) {
+        val tileSet = checkAppend(tile, playingfield)
+        if (tileSet != null) {
+          tilesToAppand.::=(tile)
+          println("press \"a" + i + "\" to append Tile:")
+          tile.printTile()
+          println("to the TileSet:")
+          utils.printTilesHorizontally(tileSet.tiles)
+          i = i + 1
+        }
+      }
+    }
+    i = 1
+    if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
       for (tileSet <- possibleMoves) {
-        i = i + 1
         println("press \"s" + i + "\" to play Tileset:")
         utils.printTilesHorizontally(tileSet.tiles)
+        i = i + 1
       }
       println("##########################################################################################")
-      println("p: Pass move, s#: Play TileSet number #")
+      println("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet")
     } else {
       println("No possible moves detected! Press \"p\" to pass move.")
     }
 
-    var input = StdIn.readLine()
+    var input = readLine()
     input match {
       //case player doesn´t want to set any Tile
       case "p" =>
@@ -61,13 +85,28 @@ class TextualGame extends GameTrait {
         input.toList match {
           case 's' :: tileNumber :: Nil =>
             var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 0: Int
+            var i = 1: Int
             for (tileSet <- possibleMoves) {
-              if (i == (number - 1)) {
+              if (i == (number)) {
                 playingfield.playTileSet(tileSet)
                 for (tile <- tileSet.tiles) {
                   player.rack.removeTile(tile)
                 }
+                player.madeFirstMove = true
+              }
+              i = i + 1
+            }
+            printPlayingField(player, playingfield)
+          case 'a' :: tileNumber :: Nil =>
+            var number: Int = Integer.valueOf(tileNumber.toString)
+            var i = 1: Int
+            tilesToAppand = tilesToAppand.sortWith((x, y) => x.color < y.color)
+            tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
+            for (tile <- tilesToAppand) {
+              if (i == (number)) {
+                var tileSet = checkAppend(tile, playingfield)
+                tileSet.append(tile)
+                player.rack.removeTile(tile)
               }
               i = i + 1
             }
@@ -137,5 +176,23 @@ class TextualGame extends GameTrait {
       i = i + 1
     }
     null
+  }
+
+  def checkAppend(tile: Tile, playingfield: Playingfield): TileSet = {
+    for (tileSet <- playingfield.playedTileSets) {
+      if (tileSet.series) {
+        //check if tile can be added at the top or bottom
+        if (tileSet.tiles.head.color == tile.color) {
+          if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
+            return tileSet
+          }
+        }
+      } else {
+        if (tileSet.tiles.head.number == tile.number) {
+          return tileSet
+        }
+      }
+    }
+    return null
   }
 }
