@@ -133,18 +133,26 @@ object ScalaFxGui extends JFXApp {
   }
 
   def setPlayer(player: Player) = {
-    rackLabel = makeLabel_Big("Your Rack Player " + player.id + ":")
-    playingFieldList = List(new Label {})
-    rackList = List(new Label {})
+    rackLabel.children.set(0, makeLabel_Big("Your Rack Player " + player.id + ":"))
+    /*TODO remove Comment
+    while(playingfieldPane.playingfieldPaneContend.children.nonEmpty){
+      playingfieldPane.playingfieldPaneContend.children.remove(0)
+    }*/
+    while (rackPane.rackPaneContend.children.nonEmpty) {
+      rackPane.rackPaneContend.children.remove(0)
+    }
   }
 
   lazy val splitedPane = new SplitPane {
     orientation = new Orientation(Orientation.Vertical)
     id = "gamePane"
     items.addAll(
-      makeLabel_Big("PlayingField:"), playingfieldPane,
-      makeLabel_Big("PossibleMoves:"), possibleSetsPane,
-      rackLabel, rackPane)
+      makeLabel_Big("PlayingField:"),
+      playingfieldPane,
+      makeLabel_Big("PossibleMoves:"),
+      possibleSetsPane,
+      rackLabel,
+      rackPane)
   }
 
   val startButton = new Button {
@@ -183,9 +191,20 @@ object ScalaFxGui extends JFXApp {
     disable = false
   }
 
-  var rackLabel = makeLabel_Big("Rack:")
+  val rackLabel = new VBox {
+    margin = Insets.apply(0, 0, 0, 12)
+    spacing = 2
+    var rackLabelLabel = new Label {
+      var viewedText = "Rack"
+      text = viewedText
+      style =
+        "-fx-font-size: 1.2em;" +
+          "-fx-font-weight: bold;"
+    }
+    children = List(rackLabelLabel)
+  }
 
-  var playingfieldPane = new ScrollPane {
+  val playingfieldPane = new ScrollPane {
     vgrow = Priority.Always
     hgrow = Priority.Always
     fitToWidth = true

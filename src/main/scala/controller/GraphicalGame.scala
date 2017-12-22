@@ -16,10 +16,10 @@ class GraphicalGame extends GameTrait {
     * @param playingfield
     */
   override def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
-    //ScalaFxGui.setPlayer(player)
-    /*for (playedTileSet <- playingfield.playedTileSets) {
+    ScalaFxGui.setPlayer(player)
+    for (playedTileSet <- playingfield.playedTileSets) {
       ScalaFxGui.printTilesToFieldPane(playedTileSet.tiles)
-    }*/
+    }
     ScalaFxGui.printTilesToRack(player.rack.tiles)
   }
 
@@ -36,7 +36,8 @@ class GraphicalGame extends GameTrait {
     }
 
 
-    //while not passing its your turn
+    //TODO hier hängt der Controller in Endlosschleife
+    // while not passing its your turn
     /*while (!player.pass && !abort) {
       // check victory
       if (player.rack.tiles.size == 0) {
@@ -44,7 +45,11 @@ class GraphicalGame extends GameTrait {
         ScalaFxGui.printLine("Congratulations Player" + player.id + ", you have won!")
         return false
       }
+      wait(100)
     }*/
+    if (abort) false
+    else true
+    //TODO remove this statement
     false
   }
 
@@ -68,11 +73,11 @@ class GraphicalGame extends GameTrait {
         ScalaFxGui.printTilesToFieldPane(List(tile))
       })
       val maxByVal = initTiles.maxBy(tile => tile.number)
-      players.foreach(p => {
-        if (p.initTile.number == maxByVal.number) {
-          starter.::=(p)
+      players.foreach(player => {
+        if (player.initTile.number == maxByVal.number) {
+          starter.::=(player)
         }
-        if (p.initTile.number == 0) {
+        if (player.initTile.number == 0) {
           jokerPicked = true
         }
       })

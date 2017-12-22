@@ -33,19 +33,19 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     val positionBeforeStarter = selectStarterPosition(starter.id)
 
     while (started) {
-      for (p <- players) {
+      for (player <- players) {
         if (!firstRound) {
-          p.pass = false
-          p.rack.addTile(utils.pickRandomTile(pool))
-          gameType.printPlayingField(p, playingfield)
-          started = gameType.play(p, playingfield, checkMoves)
+          player.pass = false
+          player.rack.addTile(utils.pickRandomTile(pool))
+          gameType.printPlayingField(player, playingfield)
+          started = gameType.play(player, playingfield, checkMoves)
           if (!started) {
-            abortGame(p)
+            abortGame(player)
             return
           }
         }
         else {
-          if (p.id == positionBeforeStarter) firstRound = false
+          if (player.id == positionBeforeStarter) firstRound = false
         }
       }
     }
