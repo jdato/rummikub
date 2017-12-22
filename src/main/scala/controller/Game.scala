@@ -30,20 +30,22 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
 
     var firstRound = true
     var starter = gameType.gambleForStartingPositon(players, pool)
-    print("Player " + starter.id + " starts.")
     val positionBeforeStarter = selectStarterPosition(starter.id)
 
     while (started) {
-      for (player <- players) {
+      for (p <- players) {
         if (!firstRound) {
-          player.pass = false
-          player.rack.addTile(pickRandomTileFromPool())
-          gameType.printPlayingField(player, playingfield)
-          started = gameType.play(player, playingfield, checkMoves)
-          if (!started) abortGame(player)
+          p.pass = false
+          p.rack.addTile(utils.pickRandomTile(pool))
+          gameType.printPlayingField(p, playingfield)
+          started = gameType.play(p, playingfield, checkMoves)
+          if (!started) {
+            abortGame(p)
+            return
+          }
         }
         else {
-          if (player.id == positionBeforeStarter) firstRound = false
+          if (p.id == positionBeforeStarter) firstRound = false
         }
       }
     }
@@ -67,36 +69,46 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     var color = 0
     var twoDecks = 0
     var number = 0
+    var numberCode = 0
 
-    val red = "\u001B[31m"
+    /*val red = "\u001B[31m"
     val blue = "\u001B[34m"
     val yellow = "\u001B[33m"
-    val black = "\u001B[30m"
+    val black = "\u001B[30m"*/
 
     for (color <- 1 to 4) {
       var currColor = matchColor(color)
+      var currColorCode = matchColorCode(color)
       for (twoDecks <- 1 to 2) {
         for (number <- 1 to 13) {
-          val tile = new Tile(currColor, number, false)
+          val tile = new Tile(currColorCode, currColor, number, false)
           pool.+=(tile)
         }
       }
     }
 
     def matchColor(x: Int): String = x match {
-      case 1 => red
-      case 2 => blue
-      case 3 => yellow
-      case 4 => black
+      case 1 => "red"
+      case 2 => "blue"
+      case 3 => "yellow"
+      case 4 => "black"
       case _ => "no color"
     }
 
-    // Add the jokers
-    val joker = new Tile(red, 0, true)
-    pool.+=(joker)
-    joker.color = black
-    pool.+=(joker)
-
+    def matchColorCode(x: Int): String = x match {
+      case 1 => "\u001B[31m"
+      case 2 => "\u001B[34m"
+      case 3 => "\u001B[33m"
+      case 4 => "\u001B[30m"
+      case _ => "no color"
+    }
+    /*
+        // Add the jokers
+        val joker = new Tile(red, 0, true)
+        pool.+=(joker)
+        joker.color = black
+        pool.+=(joker)
+    */
     println("Pool initialized.")
   }
 
@@ -140,9 +152,9 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     rack.sortNumbers()
     rack.sortColors()
     //set first color
-    color = rack.tiles.head.color
+    color = rack.tiles.head.colorCode
     for (tile <- rack.tiles) {
-      if (color == tile.color) {
+      if (color == tile.colorCode) {
         if (tile.number == number + 1) {
           count.+=(1)
           number.+=(1)
@@ -158,7 +170,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
         }
       } else {
         count = 1
-        color = tile.color
+        color = tile.colorCode
         tiles = List[Tile]().::(tile)
         number = tile.number
       }

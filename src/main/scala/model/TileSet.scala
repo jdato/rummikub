@@ -13,6 +13,7 @@ class TileSet(theTiles : List[Tile], isSeries : Boolean) {
   }
   def append(tile: Tile): Unit = {
     tiles.::=(tile)
+    tiles = tiles sortBy (_.number)
   }
   def reduce(): Unit ={
     println("Implement reduce method.")

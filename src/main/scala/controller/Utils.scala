@@ -1,5 +1,7 @@
 package controller
 
+import java.util.Random
+
 import model.Tile
 
 /**
@@ -11,21 +13,57 @@ class Utils {
   def printTilesHorizontally(tiles : List[Tile]): Unit = {
     var space = ""
 
-    tiles.foreach(t => printAndReset(t.color, " --- "))
+    tiles.foreach(t => printAndReset(t.colorCode, " --- "))
     println()
     tiles.foreach(t => {
       if(t.number < 10) space = " "
       else space = ""
-      printAndReset(t.color, "| " + t.number + space + "|")
+      printAndReset(t.colorCode, "| " + t.number + space + "|")
     })
     println()
-    tiles.foreach(t => printAndReset(t.color, "| ☺ |"))
+    tiles.foreach(t => printAndReset(t.colorCode, "| ☺ |"))
     println()
-    tiles.foreach(t => printAndReset(t.color, " --- "))
+    tiles.foreach(t => printAndReset(t.colorCode, " --- "))
     println()
   }
 
-  def printAndReset(color: String, string: String): Unit = {
+  def printTilesHorizontallyGrafic(tiles: List[Tile]): String = {
+    var space = ""
+    val string = StringBuilder.newBuilder
+    string.append("\n")
+    tiles.foreach(t => string.append(printAndReset(t.colorCode, " --- ")))
+    println()
+    string.append("\n")
+    tiles.foreach(t => {
+      if (t.number < 10) space = " "
+      else space = ""
+      string.append(printAndReset(t.colorCode, "| " + t.number + space + "|"))
+    })
+    println()
+    string.append("\n")
+    tiles.foreach(t => string.append(printAndReset(t.colorCode, "| ☺ |")))
+    println()
+    string.append("\n")
+    tiles.foreach(t => string.append(printAndReset(t.colorCode, " --- ")))
+    println()
+    string.append("\n")
+    return string.toString()
+  }
+
+  def printAndReset(color: String, string: String): String = {
     print(color + string + "\u001B[0m")
+    color + string + "\u001B[0m"
+  }
+
+  def pickRandomTile(tiles: Set[Tile]): Tile = {
+    val num = new Random().nextInt(tiles.size)
+    var i = 0: Int
+    for (t <- tiles) {
+      if (i == num) {
+        return t
+      }
+      i = i + 1
+    }
+    null
   }
 }

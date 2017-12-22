@@ -1,7 +1,5 @@
 package controller
 
-import java.util.Random
-
 import model.{Player, Playingfield, Tile, TileSet}
 
 import scala.io.StdIn
@@ -14,15 +12,16 @@ class TextualGame extends GameTrait {
     var abort = false
     player.pass = false
 
-    //TODO eher schlechter Punkt um Sieg prüfen
-    if (player.rack.tiles.size == 0) {
-      abort = true
-      println("Congratulations Player" + player.id + ", you have won!")
-      false
-    }
 
     //while not passing its your turn
     while (!player.pass) {
+      // check victory
+      if (player.rack.tiles.size == 0) {
+        abort = true
+        println("Congratulations Player" + player.id + ", you have won!")
+        return false
+      }
+
       var input: String = StdIn.readLine()
 
       input match {
@@ -100,7 +99,7 @@ class TextualGame extends GameTrait {
           case 'a' :: tileNumber :: Nil =>
             var number: Int = Integer.valueOf(tileNumber.toString)
             var i = 1: Int
-            tilesToAppand = tilesToAppand.sortWith((x, y) => x.color < y.color)
+            tilesToAppand = tilesToAppand.sortWith((x, y) => x.colorCode < y.colorCode)
             tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
             for (tile <- tilesToAppand) {
               if (i == (number)) {
@@ -144,7 +143,7 @@ class TextualGame extends GameTrait {
       var initTiles: List[Tile] = List()
       // Initial picking of numbers
       players.foreach(p => {
-        val tile = p.pickInitTile(pickRandomTile(pool))
+        val tile = p.pickInitTile(utils.pickRandomTile(pool))
         initTiles.::=(tile)
         println("Player " + p.id + " picked: ")
         tile.printTile()
@@ -163,26 +162,15 @@ class TextualGame extends GameTrait {
     } while (starter.count(p => true) > 1 || jokerPicked)
 
     val startPlayer = starter.head
+    println("Player " + startPlayer.id + " starts.")
     startPlayer
-  }
-
-  def pickRandomTile(tiles: Set[Tile]): Tile = {
-    val num = new Random().nextInt(tiles.size)
-    var i = 0: Int
-    for (t <- tiles) {
-      if (i == num) {
-        return t
-      }
-      i = i + 1
-    }
-    null
   }
 
   def checkAppend(tile: Tile, playingfield: Playingfield): TileSet = {
     for (tileSet <- playingfield.playedTileSets) {
       if (tileSet.series) {
         //check if tile can be added at the top or bottom
-        if (tileSet.tiles.head.color == tile.color) {
+        if (tileSet.tiles.head.colorCode == tile.colorCode) {
           if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
             return tileSet
           }

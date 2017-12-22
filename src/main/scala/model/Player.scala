@@ -8,7 +8,7 @@ class Player(theRack : Rack, theId : Int) {
   var id: Int = theId
   var madeFirstMove: Boolean = false
   var pass: Boolean = false
-  var initTile: Tile = new Tile("none", 0, false)
+  var initTile: Tile = new Tile("none", "none", 0, false)
   //var name = theName
   def printPlayer():Unit = {
     println("Player" + id)

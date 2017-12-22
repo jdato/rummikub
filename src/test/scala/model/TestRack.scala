@@ -15,7 +15,7 @@ class TestRack extends WordSpec {
   "After adding a Tile, the rack  " should {
     var tiles : List[Tile]= List()
     val rack = new Rack(tiles)
-    rack.addTile(new Tile("red", 3, false))
+    rack.addTile(new Tile("red", "", 3, false))
     "not be empty" in {
       assert(rack.tiles.nonEmpty)
     }
@@ -26,7 +26,7 @@ class TestRack extends WordSpec {
   "After removing a Tile, the rack  " should {
     var tiles : List[Tile]= List()
     val rack = new Rack(tiles)
-    val tile = new Tile("red", 3, false)
+    val tile = new Tile("red", "", 3, false)
     rack.addTile(tile)
     rack.removeTile(tile)
     "be empty" in {
@@ -37,9 +37,9 @@ class TestRack extends WordSpec {
   "After removing a spezific Tile, the rack  " should {
     var tiles : List[Tile]= List()
     val rack = new Rack(tiles)
-    val tile1 = new Tile("red", 3, false)
-    val tile2 = new Tile("red", 2, false)
-    val tile3 = new Tile("red", 1, false)
+    val tile1 = new Tile("red", "", 3, false)
+    val tile2 = new Tile("red", "", 2, false)
+    val tile3 = new Tile("red", "", 1, false)
     rack.addTile(tile1)
     rack.addTile(tile2)
     rack.addTile(tile3)
@@ -56,10 +56,10 @@ class TestRack extends WordSpec {
   "After sorting by number  " should {
     var tiles : List[Tile]= List()
     val rack = new Rack(tiles)
-    val tile1 = new Tile("red", 1, false)
-    val tile2 = new Tile("blue", 2, false)
-    val tile3 = new Tile("red", 3, false)
-    val tile4 = new Tile("green", 0, true)
+    val tile1 = new Tile("red", "", 1, false)
+    val tile2 = new Tile("blue", "", 2, false)
+    val tile3 = new Tile("red", "", 3, false)
+    val tile4 = new Tile("green", "", 0, true)
     rack.addTile(tile1)
     rack.addTile(tile2)
     rack.addTile(tile3)
@@ -76,10 +76,10 @@ class TestRack extends WordSpec {
   "After sorting by color  " should {
     var tiles : List[Tile]= List()
     val rack = new Rack(tiles)
-    val tile1 = new Tile("red", 1, false)
-    val tile2 = new Tile("blue", 2, false)
-    val tile3 = new Tile("red", 3, false)
-    val tile4 = new Tile("green", 0, true)
+    val tile1 = new Tile("red", "", 1, false)
+    val tile2 = new Tile("blue", "", 2, false)
+    val tile3 = new Tile("red", "", 3, false)
+    val tile4 = new Tile("green", "", 0, true)
     rack.addTile(tile1)
     rack.addTile(tile2)
     rack.addTile(tile3)

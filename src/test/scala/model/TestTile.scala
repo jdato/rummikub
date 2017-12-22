@@ -6,10 +6,10 @@ import org.scalatest.WordSpec
 class TestTile extends WordSpec {
 
   "A new Tile set to red 2 " should {
-    val tile = new Tile("red", 2, false)
+    val tile = new Tile("red", "", 2, false)
 
     "have color red" in {
-      assert(tile.color=="red")
+      assert(tile.colorCode == "red")
     }
 
     "be not a joker" in {
@@ -21,10 +21,10 @@ class TestTile extends WordSpec {
     }
   }
   "A new Tile set to black Joker " should {
-    val tile = new Tile("black", 0, true)
+    val tile = new Tile("black", "", 0, true)
 
     "have color black" in {
-      assert(tile.color=="black")
+      assert(tile.colorCode == "black")
     }
 
     "be  a joker" in {
