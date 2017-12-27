@@ -2,7 +2,7 @@ package controller
 
 import java.util.Random
 
-import model.Tile
+import model.{Playingfield, Tile, TileSet}
 
 /**
   * Created by johannesdato on 17.11.17.
@@ -65,5 +65,23 @@ class Utils {
       i = i + 1
     }
     null
+  }
+
+  def checkAppend(tile: Tile, playingfield: Playingfield): TileSet = {
+    for (tileSet <- playingfield.playedTileSets) {
+      if (tileSet.series) {
+        //check if tile can be added at the top or bottom
+        if (tileSet.tiles.head.colorCode == tile.colorCode) {
+          if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
+            return tileSet
+          }
+        }
+      } else {
+        if (tileSet.tiles.head.number == tile.number) {
+          return tileSet
+        }
+      }
+    }
+    return null
   }
 }

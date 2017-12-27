@@ -217,26 +217,6 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     return tiles.foldLeft(0) { (z, i) => z + i.number } >= 30
   }
 
-  /*
-    def checkAppend(tile: Tile): TileSet = {
-      for (tileSet <- playingfield.playedTileSets) {
-        if (tileSet.series) {
-          //check if tile can be added at the top or bottom
-          if (tileSet.tiles.head.color == tile.color) {
-            if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
-              return tileSet
-            }
-          }
-        } else {
-          if (tileSet.tiles.head.number == tile.number) {
-            return tileSet
-          }
-        }
-      }
-      return null
-    }
-  */
-
   //check if Rack contains a street or a Set
   def checkMoves(player: Player): List[TileSet] = {
     var tileSets: List[TileSet] = List[TileSet]()

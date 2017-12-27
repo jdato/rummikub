@@ -50,7 +50,7 @@ class TextualGame extends GameTrait {
     var tilesToAppand: List[Tile] = List[Tile]()
     if (player.madeFirstMove) {
       for (tile <- player.rack.tiles) {
-        val tileSet = checkAppend(tile, playingfield)
+        val tileSet = utils.checkAppend(tile, playingfield)
         if (tileSet != null) {
           tilesToAppand.::=(tile)
           println("press \"a" + i + "\" to append Tile:")
@@ -103,7 +103,7 @@ class TextualGame extends GameTrait {
             tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
             for (tile <- tilesToAppand) {
               if (i == (number)) {
-                var tileSet = checkAppend(tile, playingfield)
+                var tileSet = utils.checkAppend(tile, playingfield)
                 tileSet.append(tile)
                 player.rack.removeTile(tile)
               }
@@ -164,23 +164,5 @@ class TextualGame extends GameTrait {
     val startPlayer = starter.head
     println("Player " + startPlayer.id + " starts.")
     startPlayer
-  }
-
-  def checkAppend(tile: Tile, playingfield: Playingfield): TileSet = {
-    for (tileSet <- playingfield.playedTileSets) {
-      if (tileSet.series) {
-        //check if tile can be added at the top or bottom
-        if (tileSet.tiles.head.colorCode == tile.colorCode) {
-          if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
-            return tileSet
-          }
-        }
-      } else {
-        if (tileSet.tiles.head.number == tile.number) {
-          return tileSet
-        }
-      }
-    }
-    return null
   }
 }

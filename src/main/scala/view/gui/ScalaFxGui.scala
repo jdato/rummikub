@@ -24,11 +24,14 @@ object ScalaFxGui extends JFXApp {
   var playingFieldList = List(
     new Label {}
   )
+  var possibleSetList = List(
+    new Label {}
+  )
   var rackList = List(
     new Label {}
   )
 
-  def printTilesToFieldPane(tiles: List[Tile]) = {
+  def printTilesToFieldPane(tiles: List[Tile]): TilePane = {
     playingFieldList = List(new Label {})
     var space = ""
     var color = "black"
@@ -60,9 +63,45 @@ object ScalaFxGui extends JFXApp {
       children = playingFieldList
     }
     playingfieldPane.playingfieldPaneContend.children.add(playingfieldPaneContendTilePane)
+    playingfieldPaneContendTilePane
   }
 
-  def printTilesToRack(tiles: List[Tile]): Unit = {
+  def printTilesToInstructionPane(tiles: List[Tile]): TilePane = {
+    possibleSetList = List(new Label {})
+    var space = ""
+    var color = "black"
+    tiles.foreach(t => {
+      //make all tiles same space
+      if (t.number < 10) space = " "
+      else space = ""
+
+      //make font readable
+      if (t.color == "black" || t.color == "blue") color = "white"
+      else if (t.color == "yellow" || t.color == "red") color = "black"
+
+      possibleSetList = possibleSetList.::(
+        new Label {
+          text = space + t.number
+          padding = Insets(10)
+          style =
+            "-fx-border-color: black;" +
+              "-fx-font-size: 1.2em;" +
+              "-fx-font-weight: bold;" +
+              "-fx-background-color: " + t.color + ";" +
+              "-fx-text-fill: " + color + ";"
+        }
+      )
+    })
+    var playingfieldPaneContendTilePane = new TilePane {
+      vgrow = Priority.Always
+      hgrow = Priority.Always
+      children = possibleSetList
+    }
+    instructionPane.instructionPaneContend.children.add(playingfieldPaneContendTilePane)
+    return playingfieldPaneContendTilePane
+  }
+
+  def printTilesToRack(tiles: List[Tile]): TilePane = {
     rackList = List(new Label {})
     var space = ""
     var color = "black"
@@ -94,16 +133,18 @@ object ScalaFxGui extends JFXApp {
       children = rackList
     }
     rackPane.rackPaneContend.children.add(rackPaneContendTilePane)
+    rackPaneContendTilePane
   }
 
-  def printLine(string: String): Unit = {
+  def printLineToInstructionPane(string: String): Label = {
     var label = new Label {
       text = string
     }
-    playingfieldPane.playingfieldPaneContend.children.add(label)
+    instructionPane.instructionPaneContend.children.add(label)
+    return label
   }
 
-  def printTile(t: Tile): Unit = {
+  def printTileToInstructionPane(t: Tile): Label = {
     //make font readable
     var color = ""
     if (t.color == "black" || t.color == "blue") color = "white"
@@ -119,7 +160,8 @@ object ScalaFxGui extends JFXApp {
           "-fx-text-fill: " + color + ";"
     }
 
-    playingfieldPane.playingfieldPaneContend.children.add(tile)
+    instructionPane.instructionPaneContend.children.add(tile)
+    return tile
   }
 
   def makeLabel_Big(s: String): Node = {
@@ -150,7 +192,7 @@ object ScalaFxGui extends JFXApp {
       makeLabel_Big("PlayingField:"),
       playingfieldPane,
       makeLabel_Big("PossibleMoves:"),
-      possibleSetsPane,
+      instructionPane,
       rackLabel,
       rackPane)
   }
@@ -223,22 +265,22 @@ object ScalaFxGui extends JFXApp {
     content = playingfieldPaneContend
   }
 
-  val possibleSetsPane = new ScrollPane {
+  val instructionPane = new ScrollPane {
     vgrow = Priority.Always
     hgrow = Priority.Always
     fitToWidth = true
     minHeight = 200
     id = "possiblesets-pane"
-    var possibleSetsPaneContend = new VBox {
+    var instructionPaneContend = new VBox {
       vgrow = Priority.Always
       hgrow = Priority.Always
-      var possibleSetsPaneContendTilePane = new TilePane {
+      var instructionPaneContendTilePane = new TilePane {
         vgrow = Priority.Always
         hgrow = Priority.Always
       }
-      children = List(possibleSetsPaneContendTilePane)
+      children = List(instructionPaneContendTilePane)
     }
-    content = possibleSetsPaneContend
+    content = instructionPaneContend
   }
 
   val rackPane = new ScrollPane {
