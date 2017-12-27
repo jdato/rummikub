@@ -65,6 +65,7 @@ class GraphicalGame extends GameTrait {
           playMove(List({
             possibleMove
           }), player, playingfield)
+          play(player, playingfield, checkMoves)
         }
       }
     } else {
@@ -85,8 +86,6 @@ class GraphicalGame extends GameTrait {
     }*/
     if (abort) false
     else true
-    //TODO remove this statement
-    false
   }
 
   override def gambleForStartingPositon(players: Set[Player], pool: Set[Tile]): Player = {

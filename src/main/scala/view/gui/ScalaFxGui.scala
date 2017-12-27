@@ -3,7 +3,7 @@ package view.gui
 import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 
 import controller.{Game, GraphicalGame}
-import model.{Player, Tile}
+import model.{Player, Tile, TileSet}
 
 import scalafx.Includes._
 import scalafx.application.JFXApp
@@ -97,8 +97,45 @@ object ScalaFxGui extends JFXApp {
       hgrow = Priority.Always
       children = possibleSetList
     }
-    instructionPane.instructionPaneContend.children.add(playingfieldPaneContendTilePane)
+    instructionPane.instructionPaneContend.children.add(0, playingfieldPaneContendTilePane)
     return playingfieldPaneContendTilePane
+  }
+
+  def printTileSetToInstructionPane(tileSets: List[TileSet]): Unit = {
+    tileSets.foreach(tileSet => {
+      var tiles = tileSet.tiles
+      possibleSetList = List(new Label {})
+      var space = ""
+      var color = "black"
+      tiles.foreach(t => {
+        //make all tiles same space
+        if (t.number < 10) space = " "
+        else space = ""
+
+        //make font readable
+        if (t.color == "black" || t.color == "blue") color = "white"
+        else if (t.color == "yellow" || t.color == "red") color = "black"
+
+        possibleSetList = possibleSetList.::(
+          new Label {
+            text = space + t.number
+            padding = Insets(10)
+            style =
+              "-fx-border-color: black;" +
+                "-fx-font-size: 1.2em;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-color: " + t.color + ";" +
+                "-fx-text-fill: " + color + ";"
+          }
+        )
+      })
+      var playingfieldPaneContendTilePane = new TilePane {
+        vgrow = Priority.Always
+        hgrow = Priority.Always
+        children = possibleSetList
+      }
+      instructionPane.instructionPaneContend.children.add(0, playingfieldPaneContendTilePane)
+    })
   }
 
   def printTilesToRack(tiles: List[Tile]): TilePane = {
@@ -140,7 +177,7 @@ object ScalaFxGui extends JFXApp {
     var label = new Label {
       text = string
     }
-    instructionPane.instructionPaneContend.children.add(label)
+    instructionPane.instructionPaneContend.children.add(0, label)
     return label
   }
 
@@ -160,7 +197,7 @@ object ScalaFxGui extends JFXApp {
           "-fx-text-fill: " + color + ";"
     }
 
-    instructionPane.instructionPaneContend.children.add(tile)
+    instructionPane.instructionPaneContend.children.add(0, tile)
     return tile
   }
 
