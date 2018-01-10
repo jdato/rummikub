@@ -2,7 +2,7 @@ package view.gui
 
 import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 
-import controller.{Game, GraphicalGame}
+import controller.{GraphicalGame, Utils}
 import model.{Player, Tile, TileSet}
 
 import scalafx.Includes._
@@ -432,7 +432,8 @@ object ScalaFxGui extends JFXApp {
   }
 
   startButton.onAction = (event: ActionEvent) => {
-    var game = new Game(numberOfPlayers, new GraphicalGame)
+    var game = new GraphicalGame(numberOfPlayers, new Utils)
     game.startGame()
+
   }
 }

@@ -4,11 +4,10 @@ import model.{Player, Playingfield, Tile, TileSet}
 
 import scala.io.StdIn
 
-class TextualGame extends GameTrait {
+class TextualGame(_numberOfPlayers: Int, _utils: Utils) {
+  val utils = _utils
 
-  val utils: Utils = new Utils
-
-  override def play(player: Player, playingfield: Playingfield, checkMoves: Player => List[TileSet]): Boolean = {
+  def play(player: Player, playingfield: Playingfield, checkMoves: Player => List[TileSet], players: Set[Player]): Boolean = {
     var abort = false
     player.pass = false
 
@@ -44,7 +43,7 @@ class TextualGame extends GameTrait {
     else true
   }
 
-  override def playMove(possibleMoves: List[TileSet], player: Player, playingfield: Playingfield): Unit = {
+  def playMove(possibleMoves: List[TileSet], player: Player, playingfield: Playingfield): Unit = {
 
     var i = 1: Int
     var tilesToAppand: List[Tile] = List[Tile]()
@@ -116,7 +115,7 @@ class TextualGame extends GameTrait {
   }
 
   //prints the Playingfield for the specific Player
-  override def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
+  def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
     println("\n\n\n##########################################################################################")
     println("Played Tile Sets:")
     for (playedTileSet <- playingfield.playedTileSets) utils.printTilesHorizontally(playedTileSet.tiles)
@@ -143,7 +142,7 @@ class TextualGame extends GameTrait {
       var initTiles: List[Tile] = List()
       // Initial picking of numbers
       players.foreach(p => {
-        val tile = p.pickInitTile(utils.pickRandomTile(pool))
+        val tile = p.pickInitTile(utils.pickRandomTile())
         initTiles.::=(tile)
         println("Player " + p.id + " picked: ")
         tile.printTile()
@@ -165,4 +164,5 @@ class TextualGame extends GameTrait {
     println("Player " + startPlayer.id + " starts.")
     startPlayer
   }
+
 }

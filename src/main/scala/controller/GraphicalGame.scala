@@ -2,11 +2,30 @@ package controller
 import model.{Player, Playingfield, Tile, TileSet}
 import view.gui.ScalaFxGui
 
-class GraphicalGame extends GameTrait {
+class GraphicalGame(_numberOfPlayers: Int, utils: Utils) {
+  var playingfield: Playingfield = new Playingfield
+  val numberOfPlayers: Int = _numberOfPlayers
 
-  val utils: Utils = new Utils
+  var players: Set[Player] = Set()
+  var started = false
+  var activePlayerId = 1
 
-  override def playMove(move: List[TileSet], player: Player, playingfield: Playingfield): Unit = {
+  def startGame(): Unit = {
+    // calls init method
+    utils.initializePool()
+    players = utils.initializePlayers(numberOfPlayers)
+
+    // Enters the game loop
+    println("Game started.")
+    started = true
+
+    var firstRound = true
+    var starter = gambleForStartingPositon(players, utils.pool)
+    val positionBeforeStarter = utils.selectStarterPosition(starter.id, numberOfPlayers)
+
+  }
+
+  def playMove(move: List[TileSet], player: Player, playingfield: Playingfield): Unit = {
     var tileSet = move.head
 
     playingfield.playTileSet(tileSet)
@@ -23,7 +42,7 @@ class GraphicalGame extends GameTrait {
     * @param player
     * @param playingfield
     */
-  override def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
+  def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
     ScalaFxGui.setPlayer(player)
     for (playedTileSet <- playingfield.playedTileSets) {
       ScalaFxGui.printTilesToFieldPane(playedTileSet.tiles)
@@ -31,66 +50,48 @@ class GraphicalGame extends GameTrait {
     ScalaFxGui.printTilesToRack(player.rack.tiles)
   }
 
-  override def play(player: Player, playingfield: Playingfield, checkMoves: Player => List[TileSet]): Boolean = {
-    var abort = false
-    player.pass = false
+  def play(player: Player, playingfield: Playingfield, checkMoves: Player => List[TileSet], players: Set[Player]): Boolean = {
+    var possibleMoves = checkMoves(player)
+    var tilesToAppand: List[Tile] = List[Tile]()
+    player.rack.addTile(utils.pickRandomTile())
+    printPlayingField(player, playingfield)
 
     ScalaFxGui.checkMovesButton.onAction = event => {
-
+      if (player.madeFirstMove) {
+        player.rack.tiles.foreach(tile => {
+          val tileSet = utils.checkAppend(tile, playingfield)
+          if (tileSet != null) {
+            tilesToAppand.::=(tile)
+            ScalaFxGui.printLineToInstructionPane("Append Tile:")
+            ScalaFxGui.printTileToInstructionPane(tile)
+            ScalaFxGui.printLineToInstructionPane("to the TileSet:")
+            ScalaFxGui.printTilesToInstructionPane(tileSet.tiles)
+          }
+        })
+      }
+      if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
+        ScalaFxGui.printLineToInstructionPane("Play TileSet:")
+        possibleMoves.foreach(possibleMove => {
+          var a = ScalaFxGui.printTilesToInstructionPane(possibleMove.tiles).onMouseClicked = event => {
+            playMove(List({
+              possibleMove
+            }), player, playingfield)
+            play(player, playingfield, checkMoves, players)
+          }
+        })
+      } else {
+        ScalaFxGui.printLineToInstructionPane("No possible moves detected! Pass move.")
+      }
     }
 
     ScalaFxGui.passMovesButton.onAction = event => {
-      player.pass = true
+      //switch player
+      //print field
     }
-
-    var possibleMoves = checkMoves(player)
-    var tilesToAppand: List[Tile] = List[Tile]()
-
-    if (player.madeFirstMove) {
-
-      player.rack.tiles.foreach(tile => {
-        val tileSet = utils.checkAppend(tile, playingfield)
-        if (tileSet != null) {
-          tilesToAppand.::=(tile)
-          ScalaFxGui.printLineToInstructionPane("Append Tile:")
-          ScalaFxGui.printTileToInstructionPane(tile)
-          ScalaFxGui.printLineToInstructionPane("to the TileSet:")
-          ScalaFxGui.printTilesToInstructionPane(tileSet.tiles)
-        }
-      })
-    }
-    if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
-      ScalaFxGui.printLineToInstructionPane("Play TileSet:")
-      possibleMoves.foreach(possibleMove => {
-        var a = ScalaFxGui.printTilesToInstructionPane(possibleMove.tiles).onMouseClicked = event => {
-          playMove(List({
-            possibleMove
-          }), player, playingfield)
-          play(player, playingfield, checkMoves)
-        }
-      })
-    } else {
-      ScalaFxGui.printLineToInstructionPane("No possible moves detected! Pass move.")
-    }
-
-
-    //TODO hier hängt der Controller in Endlosschleife
-    // while not passing its your turn
-    /*while (!player.pass && !abort) {
-      // check victory
-      if (player.rack.tiles.size == 0) {
-        abort = true
-        ScalaFxGui.printLine("Congratulations Player" + player.id + ", you have won!")
-        return false
-      }
-      wait(100)
-    }*/
-    if (abort) false
-    else true
-    false
+    true
   }
 
-  override def gambleForStartingPositon(players: Set[Player], pool: Set[Tile]): Player = {
+  def gambleForStartingPositon(players: Set[Player], pool: Set[Tile]): Player = {
 
     ScalaFxGui.printLineToInstructionPane("Gambling for the starting position.")
 
@@ -104,7 +105,7 @@ class GraphicalGame extends GameTrait {
       var initTiles: List[Tile] = List()
       // Initial picking of numbers
       players.foreach(p => {
-        val tile = p.pickInitTile(utils.pickRandomTile(pool))
+        val tile = p.pickInitTile(utils.pickRandomTile())
         initTiles.::=(tile)
         ScalaFxGui.printLineToInstructionPane("Player " + p.id + " picked: ")
         ScalaFxGui.printTileToInstructionPane(tile)

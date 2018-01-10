@@ -1,6 +1,6 @@
 package view.tui
 
-import controller.{Game, TextualGame, Utils}
+import controller.{Game, Utils}
 
 import scala.io.StdIn
 
@@ -19,6 +19,6 @@ object PlayRummikub extends App {
   }
   while (numberPlayers < 2 || numberPlayers > 4)
 
-  var game = new Game(numberPlayers, new TextualGame)
+  var game = new Game(numberPlayers, new Utils)
   game.startGame()
 }
