@@ -153,7 +153,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     rack.sortColors()
     //set first color
     color = rack.tiles.head.colorCode
-    for (tile <- rack.tiles) {
+    rack.tiles.foreach(tile => {
       if (color == tile.colorCode) {
         if (tile.number == number + 1) {
           count.+=(1)
@@ -179,7 +179,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
           tileSets = tileSets.::(new TileSet(tiles, true))
         }
       }
-    }
+    })
     return tileSets
   }
 
@@ -194,7 +194,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
     var tilesToSet = List[Tile]()
 
     rack.sortNumbers()
-    for (tile <- rack.tiles) {
+    rack.tiles.foreach(tile => {
       if (number == tile.number) {
         count.+=(1)
         tiles = tiles.::(tile)
@@ -208,7 +208,7 @@ class Game(_numberOfPlayers: Int, _gameType: GameTrait) {
           tileSets = tileSets.::(new TileSet(tiles, false))
         }
       }
-    }
+    })
     return tileSets
   }
 

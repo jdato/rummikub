@@ -49,7 +49,7 @@ class TextualGame extends GameTrait {
     var i = 1: Int
     var tilesToAppand: List[Tile] = List[Tile]()
     if (player.madeFirstMove) {
-      for (tile <- player.rack.tiles) {
+      player.rack.tiles.foreach(tile => {
         val tileSet = utils.checkAppend(tile, playingfield)
         if (tileSet != null) {
           tilesToAppand.::=(tile)
@@ -59,15 +59,15 @@ class TextualGame extends GameTrait {
           utils.printTilesHorizontally(tileSet.tiles)
           i = i + 1
         }
-      }
+      })
     }
     i = 1
     if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
-      for (tileSet <- possibleMoves) {
+      possibleMoves.foreach(tileSet => {
         println("press \"s" + i + "\" to play Tileset:")
         utils.printTilesHorizontally(tileSet.tiles)
         i = i + 1
-      }
+      })
       println("##########################################################################################")
       println("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet")
     } else {

@@ -47,7 +47,8 @@ class GraphicalGame extends GameTrait {
     var tilesToAppand: List[Tile] = List[Tile]()
 
     if (player.madeFirstMove) {
-      for (tile <- player.rack.tiles) {
+
+      player.rack.tiles.foreach(tile => {
         val tileSet = utils.checkAppend(tile, playingfield)
         if (tileSet != null) {
           tilesToAppand.::=(tile)
@@ -56,18 +57,18 @@ class GraphicalGame extends GameTrait {
           ScalaFxGui.printLineToInstructionPane("to the TileSet:")
           ScalaFxGui.printTilesToInstructionPane(tileSet.tiles)
         }
-      }
+      })
     }
     if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
       ScalaFxGui.printLineToInstructionPane("Play TileSet:")
-      for (possibleMove <- possibleMoves) {
+      possibleMoves.foreach(possibleMove => {
         var a = ScalaFxGui.printTilesToInstructionPane(possibleMove.tiles).onMouseClicked = event => {
           playMove(List({
             possibleMove
           }), player, playingfield)
           play(player, playingfield, checkMoves)
         }
-      }
+      })
     } else {
       ScalaFxGui.printLineToInstructionPane("No possible moves detected! Pass move.")
     }
@@ -86,6 +87,7 @@ class GraphicalGame extends GameTrait {
     }*/
     if (abort) false
     else true
+    false
   }
 
   override def gambleForStartingPositon(players: Set[Player], pool: Set[Tile]): Player = {
