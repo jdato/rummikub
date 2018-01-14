@@ -13,8 +13,9 @@ class Controller extends Actor {
   private val observers = scala.collection.mutable.SortedSet.empty[ActorRef]
 
   override def receive: Receive = {
+    case PrintControllerStatusMessage(message: String) => printControllerStatusMessage(message)
     case StartGame => startGame()
-    case RegisterObserver => observers += sender(); sender() ! startGame()
+    case RegisterObserver => observers += sender(); printControllerStatusMessage("Subscription from: [" + sender().toString() + "]")
   }
 
   val playingfield: Playingfield = new Playingfield
@@ -22,15 +23,20 @@ class Controller extends Actor {
   var players: Set[Player] = Set()
   var pool: Set[Tile] = Set[Tile]()
 
+  def printControllerStatusMessage(message: String): Unit = {
+    println("\u001B[34m" + "CTRL: " + message + "\u001B[0m")
+  }
+
   def startGame(): Unit = {
+    observers.foreach(_ ! PrintMessage("\nGame Started!\n"))
 
     initializePool()
     initializePlayers(numberOfPlayers)
 
-    observers.foreach(_ ! PrintMessage("\nGame Started!\n"))
-
     gambleForStartingPositon(players, pool)
   }
+
+
 
   def makeMove(player: Player, next: Player, firstMove: Boolean): Unit = {
     observers.foreach(_ ! PrintMessage("Player " + player.id + " is playing."))
@@ -351,7 +357,7 @@ class Controller extends Actor {
       observers.foreach(_ ! PrintMessage("No possible moves detected! Press \"p\" to pass move."))
     }
 
-    var input = readLine()
+    var input = StdIn.readLine()
     input match {
       //case player doesn´t want to set any Tile
       case "p" =>

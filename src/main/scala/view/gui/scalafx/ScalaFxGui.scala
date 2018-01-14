@@ -1,4 +1,4 @@
-package view.gui
+package view.gui.scalafx
 
 import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 

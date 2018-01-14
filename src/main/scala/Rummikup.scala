@@ -1,6 +1,7 @@
 import akka.actor.{ActorSystem, Props}
 import controller.Controller
-import model.Messages.{PrintMessage, StartGame}
+import model.Messages.{Init, PrintMessage}
+import view.gui.SwingGuiViewActor
 import view.tui.TuiView
 
 object Rummikup {
@@ -8,14 +9,20 @@ object Rummikup {
   // Main class of the game in which the actor system gets started
 
   def main(args: Array[String]): Unit = {
+
     val actorSystem = ActorSystem.create("rummikupAS")
+
     val controller = actorSystem.actorOf(Props[Controller], "controller")
-    var tui = actorSystem.actorOf(Props(new TuiView(controller)), "tuiActor")
+    var tui = actorSystem.actorOf(Props[TuiView], "tuiActor")
+    var gui = actorSystem.actorOf(Props[SwingGuiViewActor], "guiActor")
 
-    //controller.tell(StartGame, null)
+    tui ! Init
+    gui ! Init
 
-    tui ! PrintMessage("###############################\n#        SCALA RUMMIKUP       #\n###############################")
+    while (true) {
+      val input = scala.io.StdIn.readLine()
+      tui ! input
+    }
   }
-
 
 }

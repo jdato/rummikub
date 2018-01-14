@@ -1,6 +1,6 @@
 package controller
 import model.{Player, Playingfield, Tile, TileSet}
-import view.gui.ScalaFxGui
+import view.gui.scalafx.ScalaFxGui
 
 class GraphicalGame(_numberOfPlayers: Int, utils: Utils) {
   var playingfield: Playingfield = new Playingfield

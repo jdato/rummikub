@@ -3,8 +3,11 @@ package model
 
 object Messages {
 
+  case class Init()
   case class StartGame()
   case class AbortGame()
+
+  case class Input(input: String)
 
   case class RegisterObserver()
 
@@ -12,4 +15,6 @@ object Messages {
   case class PrintPlayingField(player: Player, playingfield: Playingfield)
   case class PrintTilesHorizontally(tiles : List[Tile])
   case class PrintTile(tile: Tile)
+
+  case class PrintControllerStatusMessage(message: String)
 }
