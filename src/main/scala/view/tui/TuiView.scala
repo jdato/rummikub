@@ -1,22 +1,35 @@
 package view.tui
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorSelection}
 import model.Messages._
 import model.{Player, Playingfield, Tile}
 
-class TuiView(val controller: ActorRef) extends Actor{
+class TuiView extends Actor{
 
+  val controller: ActorSelection = context.system.actorSelection("user/controller")
   controller ! RegisterObserver
 
   override def receive: Receive = {
     case s:String => println(s)
+    case Init => init()
     case PrintMessage(message: String) => println(message)
     case PrintPlayingField(player: Player, playingfield: Playingfield) => printPlayingField(player, playingfield)
     case PrintTilesHorizontally(tiles : List[Tile]) => printTilesHorizontally(tiles)
     case PrintTile(tile: Tile) => printTile(tile)
     case AbortGame => context.system.terminate()
+    case Input(input: String) => processInput(input)
   }
 
+  def processInput(input: String): Unit = {
+    input match {
+      case "match" => controller ! StartGame
+    }
+  }
+
+  def init(): Unit = {
+    println("###############################\n#        SCALA RUMMIKUP       #\n###############################")
+    println("To start the game write 'start' enter!")
+  }
 
   //prints the Playingfield for the specific Player
   def printPlayingField(player: Player, playingfield: Playingfield): Unit = {
