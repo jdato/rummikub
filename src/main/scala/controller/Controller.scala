@@ -23,6 +23,7 @@ class Controller extends Actor {
 
   val playingfield: Playingfield = new Playingfield
   val numberOfPlayers: Int = 2
+
   var players: Set[Player] = Set()
   var pool: Set[Tile] = Set[Tile]()
   var actualPlayer: Player = _
