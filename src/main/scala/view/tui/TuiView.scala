@@ -22,7 +22,11 @@ class TuiView extends Actor{
 
   def processInput(input: String): Unit = {
     input match {
-      case "match" => controller ! StartGame
+      case "start" => controller ! StartGame
+      case "p" => controller ! Pass
+      case "c" => controller ! Check
+      case "q" => controller ! Quit
+      case _ => controller ! InvalidInput
     }
   }
 

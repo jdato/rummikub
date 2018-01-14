@@ -1,22 +1,15 @@
 package view.gui
 
 import akka.actor.ActorSelection
-import model.Messages.{PrintControllerStatusMessage, PrintMessage, StartGame}
+import model.Messages.StartGame
+import view.gui.scalafx.SwingButtonBarPanel
 
-import scala.swing.event.Key
 import scala.swing.{Action, BorderPanel, Dimension, Frame, Menu, MenuBar, MenuItem}
 
 class SwingGuiFrame(controller: ActorSelection) extends Frame{
 
   menuBar = new MenuBar {
-    contents += new Menu("File") {
-      mnemonic = Key.M
-      contents += new MenuItem(Action("New") {
-        controller ! PrintControllerStatusMessage("New Button Clicked")
-      })
-      contents += new MenuItem(Action("Quit") {
-        controller ! PrintControllerStatusMessage("Quit Button Clicked")
-      })
+    contents += new Menu("Actions") {
       contents += new MenuItem(Action("Start") {
         controller ! StartGame
       })
@@ -25,13 +18,13 @@ class SwingGuiFrame(controller: ActorSelection) extends Frame{
 
   val statusPanel = new SwingStatusBarPanel
   val gamePanel = new SwingGamePanel(controller)
+  val buttonPanel = new SwingButtonBarPanel(controller)
 
   contents = new BorderPanel {
 
-    //layout(letterTopBarPanel) = BorderPanel.Position.North
-    //layout(numberSideBarPanel) = BorderPanel.Position.West
-    //layout(gamePanel) = BorderPanel.Position.Center
+    layout(gamePanel) = BorderPanel.Position.Center
     layout(statusPanel) = BorderPanel.Position.North
+    layout(buttonPanel) = BorderPanel.Position.South
 
   }
 

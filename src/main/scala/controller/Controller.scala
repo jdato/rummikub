@@ -16,12 +16,18 @@ class Controller extends Actor {
     case PrintControllerStatusMessage(message: String) => printControllerStatusMessage(message)
     case StartGame => startGame()
     case RegisterObserver => observers += sender(); printControllerStatusMessage("Subscription from: [" + sender().toString() + "]")
+    case Pass => pass()
+    case Check => check()
+    case Quit => quit()
+    case InvalidInput => invalidInput()
   }
 
   val playingfield: Playingfield = new Playingfield
   val numberOfPlayers: Int = 2
   var players: Set[Player] = Set()
   var pool: Set[Tile] = Set[Tile]()
+  var actualPlayer: Player = _
+  var nextPlayer: Player = _
 
   def printControllerStatusMessage(message: String): Unit = {
     println("\u001B[34m" + "CTRL: " + message + "\u001B[0m")
@@ -37,7 +43,6 @@ class Controller extends Actor {
   }
 
 
-
   def makeMove(player: Player, next: Player, firstMove: Boolean): Unit = {
     observers.foreach(_ ! PrintMessage("Player " + player.id + " is playing."))
 
@@ -50,29 +55,24 @@ class Controller extends Actor {
       observers.foreach(_ ! PrintMessage("Congratulations Player" + player.id + ", you have won!"))
       abortGame(player)
     }
-
-    var input: String = StdIn.readLine()
-
-    input match {
-      //case player doesn´t want to set any Tile
-      case "p" =>
-        observers.foreach(_ ! PrintMessage("passed, next Player."))
-        makeMove(next, player, true)
-      //case player want to check for possible moves
-      case "c" =>
-        playMove(checkMoves(player), player, next) ;
-      //case player wants to exit game
-      case "q" =>
-        abortGame(player)
-      // invalid imput
-      case _ => observers.foreach(_ ! PrintMessage("invalid Input")); makeMove(player, next, false)
-    }
-
   }
 
+  def pass(): Unit = {
+    observers.foreach(_ ! PrintMessage("passed, next Player."))
+    makeMove(nextPlayer, actualPlayer, true)
+  }
 
+  def check(): Unit = {
+    playMove(checkMoves(actualPlayer), actualPlayer, nextPlayer)
+  }
 
+  def quit(): Unit = {
+    abortGame(actualPlayer)
+  }
 
+  def invalidInput(): Unit = {
+    observers.foreach(_ ! PrintMessage("invalid Input"))
+  }
 
   // Init Methods
   def initializePlayers(numberOfPlayers: Int): Unit = {
@@ -314,11 +314,11 @@ class Controller extends Actor {
       if (starter.count(p => true) > 1) observers.foreach(_ ! PrintMessage("More than one highest tile. Repeating start."))
     } while (starter.count(p => true) > 1 || jokerPicked)
 
-    val startPlayer = starter.head
-    val nextPlayer = getNextPlayer(startPlayer)
-    observers.foreach(_ ! PrintMessage("Player " + startPlayer.id + " starts."))
+    actualPlayer = starter.head
+    nextPlayer = getNextPlayer(actualPlayer)
+    observers.foreach(_ ! PrintMessage("Player " + actualPlayer.id + " starts."))
 
-    makeMove(startPlayer, nextPlayer, true)
+    makeMove(actualPlayer, nextPlayer, true)
   }
 
   def getNextPlayer(player: Player): Player = {

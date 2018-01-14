@@ -1,6 +1,6 @@
 import akka.actor.{ActorSystem, Props}
 import controller.Controller
-import model.Messages.{Init, PrintMessage}
+import model.Messages.{Init, Input, PrintMessage}
 import view.gui.SwingGuiViewActor
 import view.tui.TuiView
 
@@ -21,7 +21,7 @@ object Rummikup {
 
     while (true) {
       val input = scala.io.StdIn.readLine()
-      tui ! input
+      tui ! Input(input)
     }
   }
 
