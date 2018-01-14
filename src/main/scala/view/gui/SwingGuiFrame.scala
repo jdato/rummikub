@@ -30,6 +30,6 @@ class SwingGuiFrame(controller: ActorSelection) extends Frame{
 
   title = "The Scala Rummikup Game"
   peer.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE)
-  size = new Dimension(800, 800)
+  size = new Dimension(800, 1200)
   visible = true
 }

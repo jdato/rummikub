@@ -35,7 +35,7 @@ class SwingGuiViewActor extends Actor {
       println("Played Tile Sets:")
       for (playedTileSet <- playingfield.playedTileSets) printTilesHorizontally(playedTileSet.tiles)
     */
-
+    frame.gamePanel.printPlayingField(playingfield)
 
 
 
@@ -45,10 +45,10 @@ class SwingGuiViewActor extends Actor {
       player.rack.sortNumbers()
       player.rack.sortColors()
       printTilesHorizontally(player.rack.tiles)
-     */
+    */
+    frame.gamePanel.printRack(player)
 
-
-
+    frame.visible_=(true)
   }
 
   def printTilesHorizontally(tiles: List[Tile]): Unit = {

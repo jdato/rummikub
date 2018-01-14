@@ -6,7 +6,7 @@ import akka.actor.ActorSelection
 import model.Messages.{Check, Pass, Quit, StartGame}
 
 import scala.swing.event.ButtonClicked
-import scala.swing.{Button, GridPanel, Label}
+import scala.swing.{Button, GridPanel}
 
 class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,4) {
 
