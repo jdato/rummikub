@@ -26,6 +26,7 @@ class TuiView extends Actor{
       case "p" => controller ! Pass
       case "c" => controller ! Check
       case "q" => controller ! Quit
+      case i if i.startsWith("s") || i.startsWith("a") => controller ! SetTiles(i)
       case _ => controller ! InvalidInput
     }
   }

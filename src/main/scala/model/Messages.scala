@@ -11,6 +11,7 @@ object Messages {
   case class Pass()
   case class Check()
   case class Quit()
+  case class SetTiles(input: String)
   case class InvalidInput()
 
   case class RegisterObserver()

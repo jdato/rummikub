@@ -6,8 +6,6 @@ import akka.actor.{Actor, ActorRef}
 import model.Messages._
 import model._
 
-import scala.io.StdIn
-
 class Controller extends Actor {
 
   private val observers = scala.collection.mutable.SortedSet.empty[ActorRef]
@@ -19,6 +17,7 @@ class Controller extends Actor {
     case Pass => pass()
     case Check => check()
     case Quit => quit()
+    case SetTiles(input: String) => setTiles(input)
     case InvalidInput => invalidInput()
   }
 
@@ -28,10 +27,66 @@ class Controller extends Actor {
   var pool: Set[Tile] = Set[Tile]()
   var actualPlayer: Player = _
   var nextPlayer: Player = _
+  var possibleMoves: List[TileSet] = List()
+  var tilesToAppand: List[Tile] = List[Tile]()
 
   def printControllerStatusMessage(message: String): Unit = {
     println("\u001B[34m" + "CTRL: " + message + "\u001B[0m")
   }
+
+  def pass(): Unit = {
+    observers.foreach(_ ! PrintMessage("passed, next Player."))
+    makeMove(nextPlayer, actualPlayer, true)
+  }
+
+  def check(): Unit = {
+    possibleMoves = checkMoves(actualPlayer)
+    playMove(possibleMoves, actualPlayer, nextPlayer)
+  }
+
+  def quit(): Unit = {
+    abortGame(actualPlayer)
+  }
+
+  def invalidInput(): Unit = {
+    observers.foreach(_ ! PrintMessage("invalid Input"))
+  }
+
+  def setTiles(input: String): Unit = {
+
+      input.toList match {
+        case 's' :: tileNumber :: Nil =>
+          var number: Int = Integer.valueOf(tileNumber.toString)
+          var i = 1: Int
+          for (tileSet <- possibleMoves) {
+            if (i == number) {
+              playingfield.playTileSet(tileSet)
+              for (tile <- tileSet.tiles) {
+                actualPlayer.rack.removeTile(tile)
+              }
+              actualPlayer.madeFirstMove = true
+            }
+            i = i + 1
+          }
+          observers.foreach(_ ! PrintPlayingField(actualPlayer, playingfield))
+        case 'a' :: tileNumber :: Nil =>
+          var number: Int = Integer.valueOf(tileNumber.toString)
+          var i = 1: Int
+          tilesToAppand = tilesToAppand.sortWith((x, y) => x.colorCode < y.colorCode)
+          tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
+          for (tile <- tilesToAppand) {
+            if (i == number) {
+              var tileSet = checkAppend(tile, playingfield)
+              tileSet.append(tile)
+              actualPlayer.rack.removeTile(tile)
+            }
+            i = i + 1
+          }
+          observers.foreach(_ ! PrintPlayingField(actualPlayer, playingfield))
+        case _ => observers.foreach(_ ! PrintMessage("False Input!!!"))
+      }
+  }
+
 
   def startGame(): Unit = {
     observers.foreach(_ ! PrintMessage("\nGame Started!\n"))
@@ -55,23 +110,8 @@ class Controller extends Actor {
       observers.foreach(_ ! PrintMessage("Congratulations Player" + player.id + ", you have won!"))
       abortGame(player)
     }
-  }
-
-  def pass(): Unit = {
-    observers.foreach(_ ! PrintMessage("passed, next Player."))
-    makeMove(nextPlayer, actualPlayer, true)
-  }
-
-  def check(): Unit = {
-    playMove(checkMoves(actualPlayer), actualPlayer, nextPlayer)
-  }
-
-  def quit(): Unit = {
-    abortGame(actualPlayer)
-  }
-
-  def invalidInput(): Unit = {
-    observers.foreach(_ ! PrintMessage("invalid Input"))
+    actualPlayer = player
+    nextPlayer = next
   }
 
   // Init Methods
@@ -330,7 +370,6 @@ class Controller extends Actor {
   def playMove(possibleMoves: List[TileSet], player: Player, next: Player): Unit = {
 
     var i = 1: Int
-    var tilesToAppand: List[Tile] = List[Tile]()
     if (player.madeFirstMove) {
       player.rack.tiles.foreach(tile => {
         val tileSet = checkAppend(tile, playingfield)
@@ -354,9 +393,12 @@ class Controller extends Actor {
       observers.foreach(_ ! PrintMessage("##########################################################################################"))
       observers.foreach(_ ! PrintMessage("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet"))
     } else {
-      observers.foreach(_ ! PrintMessage("No possible moves detected! Press \"p\" to pass move."))
+      observers.foreach(_ ! PrintMessage("No possible moves detected!\np: Pass move, c: Check moves, q:Quit Game"))
     }
 
+    actualPlayer = player
+    nextPlayer = next
+/*
     var input = StdIn.readLine()
     input match {
       //case player doesn´t want to set any Tile
@@ -398,6 +440,7 @@ class Controller extends Actor {
     }
 
     makeMove(player, next, player.pass)
+    */
   }
 
 }
