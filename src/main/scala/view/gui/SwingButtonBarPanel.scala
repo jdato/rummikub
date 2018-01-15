@@ -8,7 +8,7 @@ import model.Messages._
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, GridPanel}
 
-class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,5) {
+class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,4) {
 
   background = Color.WHITE
 
@@ -18,7 +18,6 @@ class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,5) {
   val passBtn = new Button("Pass")
   val checkBtn = new Button("Check")
   val quitBtn = new Button("Quit")
-  val testBtn = new Button("Test")
 
   startBtn.reactions += {
     case _: ButtonClicked => controller ! StartGame
@@ -32,14 +31,9 @@ class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,5) {
   quitBtn.reactions += {
     case _: ButtonClicked => controller ! Quit
   }
-  testBtn.reactions += {
-    case _: ButtonClicked =>
-  }
 
   contents += startBtn
   contents += passBtn
   contents += checkBtn
   contents += quitBtn
-  contents += testBtn // Panel anpassen ^^
-
 }

@@ -30,6 +30,7 @@ class Controller extends Actor {
   var nextPlayer: Player = _
   var possibleMoves: List[TileSet] = List()
   var tilesToAppand: List[Tile] = List[Tile]()
+  var tilesToAppendToTileSet: Map[Tile, TileSet] = Map()
 
   def printControllerStatusMessage(message: String): Unit = {
     println("\u001B[34m" + "CTRL: " + message + "\u001B[0m")
@@ -41,6 +42,8 @@ class Controller extends Actor {
   }
 
   def check(): Unit = {
+    tilesToAppand = List()
+    tilesToAppendToTileSet = Map()
     possibleMoves = checkMoves(actualPlayer)
     playMove(possibleMoves, actualPlayer, nextPlayer)
   }
@@ -175,19 +178,6 @@ class Controller extends Actor {
     case 4 => "\u001B[30m"
     case _ => "no color"
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -384,6 +374,7 @@ class Controller extends Actor {
           observers.foreach(_ ! PrintTile(tile))
           observers.foreach(_ ! PrintMessage("to the TileSet:"))
           observers.foreach(_ ! PrintTilesHorizontally(tileSet.tiles))
+          tilesToAppendToTileSet += ((tile, tileSet))
           i = i + 1
         }
       })
@@ -397,60 +388,23 @@ class Controller extends Actor {
         tileSets.::=(tileSet)
         i = i + 1
       })
+      // 1. Appends
+      observers.foreach(_ ! PrintPossibleAppendsToTileSets(tilesToAppendToTileSet))
+      // 2. Sets
       observers.foreach(_ ! PrintPossibleTileSets(tileSets))
       observers.foreach(_ ! PrintMessage("##########################################################################################"))
       observers.foreach(_ ! PrintMessage("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet"))
     } else {
       observers.foreach(_ ! PrintMessage("No possible moves detected!\np: Pass move, c: Check moves, q:Quit Game"))
+      // 1. Appends
+      observers.foreach(_ ! PrintPossibleAppendsToTileSets(tilesToAppendToTileSet))
+      // 2. Sets
       observers.foreach(_ ! PrintPossibleTileSets(tileSets))
 
     }
 
     actualPlayer = player
     nextPlayer = next
-/*
-    var input = StdIn.readLine()
-    input match {
-      //case player doesn´t want to set any Tile
-      case "p" =>
-        observers.foreach(_ ! PrintMessage("Player " + player.id + " passed, next Player:"))
-        player.pass = true
-      case _ =>
-        input.toList match {
-          case 's' :: tileNumber :: Nil =>
-            var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 1: Int
-            for (tileSet <- possibleMoves) {
-              if (i == number) {
-                playingfield.playTileSet(tileSet)
-                for (tile <- tileSet.tiles) {
-                  player.rack.removeTile(tile)
-                }
-                player.madeFirstMove = true
-              }
-              i = i + 1
-            }
-            //FIXME observers.foreach(_ ! PrintPlayingField(player, playingfield))
-          case 'a' :: tileNumber :: Nil =>
-            var number: Int = Integer.valueOf(tileNumber.toString)
-            var i = 1: Int
-            tilesToAppand = tilesToAppand.sortWith((x, y) => x.colorCode < y.colorCode)
-            tilesToAppand = tilesToAppand.sortWith((x, y) => x.number < y.number)
-            for (tile <- tilesToAppand) {
-              if (i == number) {
-                var tileSet = checkAppend(tile, playingfield)
-                tileSet.append(tile)
-                player.rack.removeTile(tile)
-              }
-              i = i + 1
-            }
-            //FIXME observers.foreach(_ ! PrintPlayingField(player, playingfield))
-          case _ => observers.foreach(_ ! PrintMessage("False Input!!!"))
-        }
-    }
-
-    makeMove(player, next, player.pass)
-    */
   }
 
 }

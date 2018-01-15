@@ -16,9 +16,8 @@ class SwingGuiViewActor extends Actor {
     case StartGame => println("start swing gui game")
     case PrintMessage(message: String) => frame.statusPanel.setStatus(message)
     case PrintPlayingField(player: Player, playingfield: Playingfield) => printPlayingField(player, playingfield)
-    case PrintTilesHorizontally(tiles : List[Tile]) => frame.statusPanel.setAlert("SwingGuiViewActor -> Receive -> PrintTilesHorizontally(tiles : List[Tile]) -> NIY")
     case PrintPossibleTileSets(tileSets : List[TileSet]) => printPossibleTileSets(tileSets)
-    case PrintTile(tile: Tile) => frame.statusPanel.setAlert("SwingGuiViewActor -> Receive -> PrintTile(tile : Tile) -> NIY")
+    case PrintPossibleAppendsToTileSets(tilesToAppendToTileSet : Map[Tile, TileSet]) => printPossibleAppendToTileSets(tilesToAppendToTileSet)
     case AbortGame => context.system.terminate()
   }
 
@@ -37,12 +36,23 @@ class SwingGuiViewActor extends Actor {
 
     // 3. Update frame to refresh view
     frame.visible_=(true)
+
+    frame.gamePanel.possibleSetsPane.contents.clear()
+    frame.gamePanel.possibleAppendsPane.contents.clear()
+
     frame.gamePanel.possibleSetsPane.visible_=(false)
     frame.gamePanel.possibleSetsPane.visible_=(true)
+    frame.gamePanel.possibleAppendsPane.visible_=(false)
+    frame.gamePanel.possibleAppendsPane.visible_=(true)
   }
 
   def printPossibleTileSets(tileSets: List[TileSet]): Unit = {
     frame.gamePanel.printPossibleSets(tileSets)
+    frame.visible_=(true)
+  }
+
+  def printPossibleAppendToTileSets(tileToSet: Map[Tile, TileSet]): Unit = {
+    frame.gamePanel.printPossibleAppends(tileToSet)
     frame.visible_=(true)
   }
 }

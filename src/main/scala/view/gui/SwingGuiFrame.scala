@@ -7,14 +7,6 @@ import scala.swing.{Action, BorderPanel, Dimension, Frame, Menu, MenuBar, MenuIt
 
 class SwingGuiFrame(controller: ActorSelection) extends Frame{
 
-  menuBar = new MenuBar {
-    contents += new Menu("Actions") {
-      contents += new MenuItem(Action("Start") {
-        controller ! StartGame
-      })
-    }
-  }
-
   val statusPanel = new SwingStatusBarPanel
   val gamePanel = new SwingGamePanel(controller)
   val buttonPanel = new SwingButtonBarPanel(controller)

@@ -4,7 +4,7 @@ import java.awt.{Color, ComponentOrientation, Font}
 
 import akka.actor.ActorSelection
 import model.Messages.SetTiles
-import model.{Player, Playingfield, TileSet}
+import model.{Player, Playingfield, Tile, TileSet}
 
 import scala.collection.mutable.ListBuffer
 import scala.swing.event.ButtonClicked
@@ -13,7 +13,7 @@ import scala.swing.{Alignment, Button, Dimension, Font, GridPanel, Label, Swing}
 class SwingGamePanel(controller: ActorSelection) extends GridPanel(4, 0) {
 
   val arialFont = new Font("Arial", Font.CENTER_BASELINE, 20)
-  val darkGreyBackground = Color.DARK_GRAY
+  val darkGreyBackground = Color.LIGHT_GRAY
   val panelBorder = Swing.LineBorder(Color.BLACK)
   val emptyTileText = ""
 
@@ -68,7 +68,7 @@ class SwingGamePanel(controller: ActorSelection) extends GridPanel(4, 0) {
   }
 
 
-  // PossibleSets
+  // Possible Sets
   def printPossibleSets(tileSets: List[TileSet]): Unit = {
 
     possibleSetsPane.contents.clear()
@@ -134,9 +134,92 @@ class SwingGamePanel(controller: ActorSelection) extends GridPanel(4, 0) {
   }
 
 
-  // TODO Possible Appends
-  def printPossibleAppends(): Unit = {
+  // Possible Appends
+  def printPossibleAppends(tileToSet: Map[Tile, TileSet]): Unit = {
 
+    possibleAppendsPane.contents.clear()
+
+    val tileSetRow = new GridPanel(20, 20) {
+      background = darkGreyBackground
+      componentOrientation = ComponentOrientation.LEFT_TO_RIGHT
+    }
+
+    // tileToSet.size and then count down
+    var number: Int = 1
+
+    tileToSet.foreach(possibleAppend => {
+
+      val num = number
+
+      possibleAppendsPane.contents += new Button() {
+        minimumSize = new Dimension(15, 5)
+        text = "a" + num
+        reactions += {
+          case _: ButtonClicked => {
+            controller ! SetTiles("a" + num)
+            possibleAppendsPane.contents.clear()
+            possibleAppendsPane.visible_=(true)
+          }
+        }
+      }
+
+      // norm count down
+      number = number + 1
+
+      // Print the tile
+      val color = matchColor(possibleAppend._1.color)
+
+      val appendTile = new Label() {
+        //icon = new ImageIcon("images/tile.png")
+        text = possibleAppend._1.number.toString
+        font = arialFont
+        foreground = color
+        verticalAlignment = Alignment.Center
+      }
+
+      possibleAppendsPane.contents += appendTile
+
+
+      // Print the divider label
+      val divider = new Label() {
+        text = "to"
+        font = arialFont
+        foreground = Color.DARK_GRAY
+        verticalAlignment = Alignment.Center
+      }
+
+      possibleAppendsPane.contents += divider
+
+
+      // Print the Tileset
+      possibleAppend._2.tiles.foreach(tile => {
+        val color = matchColor(tile.color)
+
+        val realTile = new Label() {
+          //icon = new ImageIcon("images/tile.png")
+          text = tile.number.toString
+          font = arialFont
+          foreground = color
+          verticalAlignment = Alignment.Center
+        }
+
+        possibleAppendsPane.contents += realTile
+      })
+
+      val numberOfColsToFill: Int = tileSetRow.columns - possibleAppend._2.tiles.size - 3
+
+      for (i <- 1 to numberOfColsToFill) {
+        val fillTile = new Label() {
+          //icon = new ImageIcon("images/tile.png")
+          text = emptyTileText
+          font = arialFont
+          verticalAlignment = Alignment.Center
+        }
+
+        possibleAppendsPane.contents += fillTile
+      }
+
+    })
   }
 
   val possibleAppendsPane = new GridPanel(0, 20) {
@@ -175,7 +258,7 @@ class SwingGamePanel(controller: ActorSelection) extends GridPanel(4, 0) {
   val rackPane = new GridPanel(1, 40) {
     border = panelBorder
     preferredSize = new Dimension(60, 60)
-    background = Color.LIGHT_GRAY
+    background = darkGreyBackground
   }
 
   contents += playingFieldPane
