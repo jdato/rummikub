@@ -17,6 +17,7 @@ class Controller extends Actor {
     case Pass => pass()
     case Check => check()
     case Quit => quit()
+    case GameOver(player: Player) => observers.foreach(_ ! GameOver(actualPlayer))
     case SetTiles(input: String) => setTiles(input)
     case InvalidInput => invalidInput()
   }
@@ -91,6 +92,10 @@ class Controller extends Actor {
           observers.foreach(_ ! PrintPlayingField(actualPlayer, playingfield))
         case _ => observers.foreach(_ ! PrintMessage("False Input!!!"))
       }
+
+    if(actualPlayer.rack.tiles.isEmpty) {
+      observers.foreach(_ ! GameOver(actualPlayer))
+    }
   }
 
 
@@ -107,7 +112,7 @@ class Controller extends Actor {
   def makeMove(player: Player, next: Player, firstMove: Boolean): Unit = {
     observers.foreach(_ ! PrintMessage("Player " + player.id + " is playing."))
 
-    if(firstMove) player.rack.addTile(pickRandomTile())
+    if(firstMove && pool.nonEmpty) player.rack.addTile(pickRandomTile())
 
     observers.foreach(_ ! PrintPlayingField(player, playingfield))
 
@@ -144,11 +149,6 @@ class Controller extends Actor {
     var twoDecks = 0
     var number = 0
     var numberCode = 0
-
-    /*val red = "\u001B[31m"
-    val blue = "\u001B[34m"
-    val yellow = "\u001B[33m"
-    val black = "\u001B[30m"*/
 
     for (color <- 1 to 4) {
       var currColor = matchColor(color)
@@ -193,6 +193,7 @@ class Controller extends Actor {
     var i = 0: Int
     for (t <- pool) {
       if (i == num) {
+        pool = pool - t
         return t
       }
       i = i + 1
@@ -222,7 +223,7 @@ class Controller extends Actor {
   def pickRandomTileFromPool(): Tile = {
     var poolArray = pool.toArray
     var tile = poolArray(new Random().nextInt(pool.size))
-    pool.-=(tile)
+    pool = pool - tile
     tile
   }
 

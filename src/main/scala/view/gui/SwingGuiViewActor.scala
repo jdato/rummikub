@@ -18,6 +18,7 @@ class SwingGuiViewActor extends Actor {
     case PrintPlayingField(player: Player, playingfield: Playingfield) => printPlayingField(player, playingfield)
     case PrintPossibleTileSets(tileSets : List[TileSet]) => printPossibleTileSets(tileSets)
     case PrintPossibleAppendsToTileSets(tilesToAppendToTileSet : Map[Tile, TileSet]) => printPossibleAppendToTileSets(tilesToAppendToTileSet)
+    case GameOver(player : Player) => endGame(player)
     case AbortGame => context.system.terminate()
   }
 
@@ -54,5 +55,20 @@ class SwingGuiViewActor extends Actor {
   def printPossibleAppendToTileSets(tileToSet: Map[Tile, TileSet]): Unit = {
     frame.gamePanel.printPossibleAppends(tileToSet)
     frame.visible_=(true)
+  }
+
+  def endGame(player: Player): Unit = {
+    frame.statusPanel.setAlert("Congratulations Player " + player.id + "!! You've won the game!!")
+
+    frame.gamePanel.possibleSetsPane.contents.clear()
+    frame.gamePanel.possibleAppendsPane.contents.clear()
+    frame.gamePanel.rackPane.contents.clear()
+
+    frame.gamePanel.possibleSetsPane.visible_=(false)
+    frame.gamePanel.possibleSetsPane.visible_=(true)
+    frame.gamePanel.possibleAppendsPane.visible_=(false)
+    frame.gamePanel.possibleAppendsPane.visible_=(true)
+    frame.gamePanel.rackPane.visible_=(false)
+    frame.gamePanel.rackPane.visible_=(true)
   }
 }

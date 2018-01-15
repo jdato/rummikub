@@ -16,6 +16,7 @@ class TuiView extends Actor{
     case PrintPlayingField(player: Player, playingfield: Playingfield) => printPlayingField(player, playingfield)
     case PrintTilesHorizontally(tiles : List[Tile]) => printTilesHorizontally(tiles)
     case PrintTile(tile: Tile) => printTile(tile)
+    case GameOver(player : Player) => endGame(player)
     case AbortGame => context.system.terminate()
     case Input(input: String) => processInput(input)
   }
@@ -80,6 +81,11 @@ class TuiView extends Actor{
     }
     if(tile.number == 0) print("| ☺ |\n")
     print("| ® |\n --- \n" + tile.reset)
+  }
+
+  def endGame(player: Player): Unit = {
+    println("Congratulations Player " + player.id + "!! You've won the game!!")
+    controller ! AbortGame
   }
 
 }

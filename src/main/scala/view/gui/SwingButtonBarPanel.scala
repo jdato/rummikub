@@ -29,7 +29,7 @@ class SwingButtonBarPanel(controller: ActorSelection) extends GridPanel(1,4) {
     case _: ButtonClicked => controller ! Check
   }
   quitBtn.reactions += {
-    case _: ButtonClicked => controller ! Quit
+    case _: ButtonClicked => controller ! Quit      //Simulation GameOver(new Player(new Rack(List()), 12))
   }
 
   contents += startBtn
