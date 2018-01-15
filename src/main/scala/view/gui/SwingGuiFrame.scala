@@ -2,7 +2,6 @@ package view.gui
 
 import akka.actor.ActorSelection
 import model.Messages.StartGame
-import view.gui.scalafx.SwingButtonBarPanel
 
 import scala.swing.{Action, BorderPanel, Dimension, Frame, Menu, MenuBar, MenuItem}
 

@@ -19,6 +19,7 @@ object Messages {
   case class PrintMessage(s : String)
   case class PrintPlayingField(player: Player, playingfield: Playingfield)
   case class PrintTilesHorizontally(tiles : List[Tile])
+  case class PrintPossibleTileSets(tileSets : List[TileSet])
   case class PrintTile(tile: Tile)
 
   case class PrintControllerStatusMessage(message: String)

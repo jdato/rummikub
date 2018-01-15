@@ -55,6 +55,8 @@ class Controller extends Actor {
 
   def setTiles(input: String): Unit = {
 
+    observers.foreach(_ ! SetTiles(input))
+
       input.toList match {
         case 's' :: tileNumber :: Nil =>
           var number: Int = Integer.valueOf(tileNumber.toString)
@@ -193,6 +195,7 @@ class Controller extends Actor {
     // Exits the game loop
     observers.foreach(_ ! PrintMessage("Game aborted, by player " + p.id + "!"))
     observers.foreach(_ ! AbortGame)
+    context.system.terminate()
   }
 
   def pickRandomTile(): Tile = {
@@ -372,6 +375,7 @@ class Controller extends Actor {
 
     var i = 1: Int
     if (player.madeFirstMove) {
+      // TODO implement append logic
       player.rack.tiles.foreach(tile => {
         val tileSet = checkAppend(tile, playingfield)
         if (tileSet != null) {
@@ -385,16 +389,21 @@ class Controller extends Actor {
       })
     }
     i = 1
+    var tileSets: List[TileSet] = List()
     if (possibleMoves.nonEmpty || tilesToAppand.nonEmpty) {
       possibleMoves.foreach(tileSet => {
         observers.foreach(_ ! PrintMessage("press \"s" + i + "\" to play Tileset:"))
         observers.foreach(_ ! PrintTilesHorizontally(tileSet.tiles))
+        tileSets.::=(tileSet)
         i = i + 1
       })
+      observers.foreach(_ ! PrintPossibleTileSets(tileSets))
       observers.foreach(_ ! PrintMessage("##########################################################################################"))
       observers.foreach(_ ! PrintMessage("p: Pass move, s#: Play TileSet number #, a#: to append Tile # to a TileSet"))
     } else {
       observers.foreach(_ ! PrintMessage("No possible moves detected!\np: Pass move, c: Check moves, q:Quit Game"))
+      observers.foreach(_ ! PrintPossibleTileSets(tileSets))
+
     }
 
     actualPlayer = player
