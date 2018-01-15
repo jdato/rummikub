@@ -229,7 +229,7 @@ class Controller extends Actor {
 
   //checking for same colored series in the rack
   def checkSeries(player: Player): List[TileSet] = {
-    //TODO method ignores jockers
+    // method ignores jockers
     var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
@@ -274,7 +274,7 @@ class Controller extends Actor {
 
   // checking for any Sets in the rack
   def checkSet(player: Player): List[TileSet] = {
-    //TODO method ignores jockers and same colored Tiles
+    // method ignores jockers and same colored Tiles
     var rack = player.rack
     var tileSets: List[TileSet] = List[TileSet]()
     var tiles: List[Tile] = List[Tile]()
@@ -366,7 +366,6 @@ class Controller extends Actor {
 
     var i = 1: Int
     if (player.madeFirstMove) {
-      // TODO implement append logic
       player.rack.tiles.foreach(tile => {
         val tileSet = checkAppend(tile, playingfield)
         if (tileSet != null) {
