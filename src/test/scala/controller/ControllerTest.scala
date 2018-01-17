@@ -26,15 +26,15 @@ class ControllerTest extends TestKit(ActorSystem("rummikupAS")) with ImplicitSen
     controller ! RegisterObserver
 
     controller ! StartGame
-    expectMsgAnyOf(PrintMessage("\nGame Started!\n"))
-    expectMsgAnyOf(PrintMessage("Pool initialized!"))
-    expectMsgAnyOf(PrintMessage("Players initialized!"))
-    expectMsgAnyOf(PrintMessage("Gambling for the starting position."))
-
+    expectMsg(PrintMessage("\nGame Started!\n"))
+    expectMsg(PrintMessage("Pool initialized!"))
+    expectMsg(PrintMessage("Players initialized!"))
+    expectMsg(PrintMessage("Gambling for the starting position."))
+    //... Hier werden noch mehrere Messages gesendet die den nächsten Test stören ...
 
     /*
     controller ! Pass()
-    expectMsgAnyOf(PrintMessage("passed, next Player."))
+    expectMsg(PrintMessage("passed, next Player."))
     */
   }
 
