@@ -23,7 +23,11 @@ class Controller extends Actor {
   }
 
   val playingfield: Playingfield = new Playingfield
-  val numberOfPlayers: Int = 2
+
+  // ##############################
+  //    Set the number of players
+  // ##############################
+  val numberOfPlayers: Int = 4
 
   var players: Set[Player] = Set()
   var pool: Set[Tile] = Set[Tile]()
@@ -39,7 +43,8 @@ class Controller extends Actor {
 
   def pass(): Unit = {
     observers.foreach(_ ! PrintMessage("passed, next Player."))
-    makeMove(nextPlayer, actualPlayer, true)
+    val next = getNextPlayer(actualPlayer)
+    makeMove(next, actualPlayer, true)
   }
 
   def check(): Unit = {
