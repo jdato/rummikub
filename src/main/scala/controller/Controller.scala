@@ -2,11 +2,14 @@ package controller
 
 import java.util.Random
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import model.Messages._
 import model._
 
+
 class Controller extends Actor {
+
+  def props = Props(new Controller())
 
   private val observers = scala.collection.mutable.SortedSet.empty[ActorRef]
 
@@ -210,8 +213,9 @@ class Controller extends Actor {
     for (tileSet <- playingfield.playedTileSets) {
       if (tileSet.series) {
         //check if tile can be added at the top or bottom
+        tileSet.tiles = tileSet.tiles sortBy (_.number)
         if (tileSet.tiles.head.colorCode == tile.colorCode) {
-          if (tileSet.tiles.head.number == tile.number - 1 || tileSet.tiles.last.number == tile.number + 1) {
+          if ((tileSet.tiles.head.number- 1) == tile.number || (tileSet.tiles.last.number + 1) == tile.number) {
             return tileSet
           }
         }

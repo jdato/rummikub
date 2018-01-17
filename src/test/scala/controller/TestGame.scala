@@ -1,4 +1,4 @@
-package game
+package controller
 
 import org.scalatest.WordSpec
 
