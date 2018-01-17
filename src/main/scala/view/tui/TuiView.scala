@@ -33,7 +33,7 @@ class TuiView extends Actor{
   }
 
   def init(): Unit = {
-    println("###############################\n#        SCALA RUMMIKUP       #\n###############################")
+    println("###############################\n#        SCALA RUMMIKUB       #\n###############################")
     println("To start the game write 'start' enter!")
   }
 
