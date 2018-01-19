@@ -2,10 +2,9 @@ package controller
 
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
-import model.Messages._
+import model.Messages.{InvalidInput, Pass, Quit, RegisterObserver, StartGame, _}
+import model.{Player, Playingfield, Rack, Tile}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
-import view.gui.SwingGuiViewActor
-import view.tui.TuiView
 
 class ControllerTest extends TestKit(ActorSystem("rummikupAS")) with ImplicitSender with FlatSpecLike with Matchers with BeforeAndAfterAll {
 
@@ -25,17 +24,91 @@ class ControllerTest extends TestKit(ActorSystem("rummikupAS")) with ImplicitSen
 
     controller ! RegisterObserver
 
+    /*
+    test of the StartGame function
+    after the first Text message all other Text messages should be ignored
+     */
     controller ! StartGame
+    var player = new Player(new Rack(List()), 1)
     expectMsg(PrintMessage("\nGame Started!\n"))
-    expectMsg(PrintMessage("Pool initialized!"))
-    expectMsg(PrintMessage("Players initialized!"))
-    expectMsg(PrintMessage("Gambling for the starting position."))
-    //... Hier werden noch mehrere Messages gesendet die den nächsten Test stören ...
+    // ignore all PrintMessages and Print Tile Messages
+    // messages are to random for testing correctly
+    ignoreMsg ({
+      case msg: PrintMessage ⇒ msg != PrintMessage("ignore all")
+      case msg: PrintTile ⇒ msg != PrintTile(new Tile("all","all", -1, true))
+    })
+    expectMsgClass(PrintPlayingField(player, new Playingfield).getClass)
+    //stop ignoring all PrintMessages
+    ignoreNoMsg()
 
     /*
-    controller ! Pass()
+    test of the pass function
+    after the first Text message all other Text messages should be ignored
+     */
+    controller ! Pass
     expectMsg(PrintMessage("passed, next Player."))
+    ignoreMsg ({
+      case msg: PrintMessage ⇒ true
+      //case msg: PrintTile ⇒ true
+    })
+    expectMsgClass(PrintPlayingField(player, new Playingfield).getClass)
+    //stop ignoring all PrintMessages
+    ignoreNoMsg()
+
+
+    /*
+    test of the printControllerStatusMessage function
+    commented cause only send simple System.out.println()
+     */
+    //controller ! PrintControllerStatusMessage("message")
+    //TODO ? runs simple System.out.println() methode
+
+    /*/*
+    test of the pass function
+     */
+    controller ! Check
+    //TODO
+    ignoreMsg ({
+      case msg: PrintPossibleAppendsToTileSets ⇒ true
+      case msg: PrintPossibleTileSets ⇒ true
+      case msg: PrintMessage ⇒ true
+    })
+    expectMsgClass(PrintPossibleAppendsToTileSets(Map()).getClass)
+    expectMsgClass(PrintPossibleTileSets(List()).getClass)
+
+    ignoreNoMsg()
     */
+
+
+    /*
+    test of the invalidImput function
+     */
+    controller ! InvalidInput
+    expectMsg(PrintMessage("invalid Input"))
+
+    /*
+    test of the SetTiles function
+    hard to test cause not possible to detect if and which tileset is possible to set
+     */
+    //controller ! SetTiles("s1")
+    //expectMsg(PrintMessage("passed, next Player."))
+
+
+    /*
+    test of the gameover function
+     */
+    var tiles : List[Tile]= List()
+    val rack = new Rack(tiles)
+    controller ! GameOver(new Player(rack,1))
+    expectMsgClass(GameOver(new Player(rack,1)).getClass)
+
+
+    /*
+    test of the quit function
+     */
+    controller ! Quit
+    expectMsgClass(PrintMessage("").getClass)
+    expectMsgClass(AbortGame.getClass)
   }
 
 }
