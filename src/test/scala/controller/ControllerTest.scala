@@ -33,10 +33,10 @@ class ControllerTest extends TestKit(ActorSystem("rummikupAS")) with ImplicitSen
     expectMsg(PrintMessage("\nGame Started!\n"))
     // ignore all PrintMessages and Print Tile Messages
     // messages are to random for testing correctly
-    ignoreMsg ({
-      case msg: PrintMessage => true
-      case msg: PrintTile => true
-    })
+    ignoreMsg{
+      case msg : PrintMessage => msg.s != "passed, next Player."
+      case msg : PrintTile => msg.tile != null
+    }
     expectMsgClass(PrintPlayingField(player, new Playingfield).getClass)
     //stop ignoring all PrintMessages
     ignoreNoMsg()
