@@ -10,11 +10,6 @@ class Player(theRack : Rack, theId : Int) {
   var pass: Boolean = false
   var initTile: Tile = new Tile("none", "none", 0, false)
 
-  def printPlayer():Unit = {
-    println("Player" + id)
-    rack.printRack()
-  }
-
   def pickInitTile(tile: Tile) : Tile = {
     initTile = tile
     initTile
